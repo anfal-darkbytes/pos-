@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Pulse POS{% endblock %} — Pulse POS</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <!-- Progressive Web App (PWA) Manifest & Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pulse POS">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icons/icon-192.png') }}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='images/icons/icon-152.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/icons/icon-192.png') }}">
+  <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='images/icons/icon-152.png') }}">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#10b981',
+              foreground: '#ffffff',
+              50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7',
+              400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857',
+              800: '#065f46', 900: '#064e3b',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script>
+    // Apply theme before render to avoid flash
+    (function () {
+      const theme = localStorage.getItem('quickpos-theme') || 'light';
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+    })();
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden transition-opacity lg:hidden" aria-hidden="true"></div>
+
+    <!-- Sidebar -->
+    <aside id="appSidebar" class="fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-[#0c121e] text-gray-100 border-r border-gray-800/80 shadow-2xl lg:shadow-none lg:static lg:z-auto transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
+      
+      <!-- Brand & Header -->
+      <div class="flex items-center justify-between px-4 h-16 border-b border-gray-800/80 bg-gray-900/40 shrink-0">
+        <a href="/" class="flex items-center gap-3 group focus:outline-none">
+          <div class="relative w-10 h-10 rounded-xl overflow-hidden ring-1 ring-emerald-500/30 shadow-md shadow-emerald-500/10 group-hover:ring-emerald-400/50 transition-all shrink-0">
+            <img src="{{ url_for('static', filename='images/pulse-logo-icon.svg') }}" alt="Pulse POS Logo" class="w-full h-full object-cover">
+          </div>
+          <div class="flex flex-col leading-tight min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-[15px] tracking-tight text-white group-hover:text-emerald-400 transition-colors">Pulse</span>
+              <span class="text-[9.5px] uppercase font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">POS</span>
+            </div>
+            <span class="text-[10.5px] text-gray-400 font-medium tracking-wide">Enterprise Edition</span>
+          </div>
+        </a>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors" title="Close Sidebar">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Prominent POS Terminal Hero Button -->
+      <div class="px-3 pt-3.5 pb-1 shrink-0">
+        <a href="/pos" class="sidebar-nav-link group relative flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-950/40 border border-emerald-400/20 transition-all duration-200 active:scale-[0.98] {% if active_view == 'pos' %}ring-2 ring-emerald-400/60 pos-hero-btn{% endif %}">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-black/20 backdrop-blur-sm grid place-items-center shrink-0 group-hover:scale-105 transition-transform">
+              <i data-lucide="shopping-cart" class="w-4 h-4 text-white"></i>
+            </div>
+            <div class="flex flex-col text-left leading-tight min-w-0">
+              <span class="text-xs font-bold tracking-wide">POS Terminal</span>
+              <span class="text-[10px] text-emerald-100/90 font-normal truncate">Fast checkout & barcode</span>
+            </div>
+          </div>
+          <span class="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/30 text-white/90 border border-white/10 shrink-0">F1</span>
+        </a>
+      </div>
+
+      <!-- Navigation Links Container -->
+      <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-4 pos-scroll">
+        
+        <!-- SECTION 1: OPERATIONS -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Operations</span>
+          </div>
+
+          <a href="/" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'dashboard' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Dashboard</span>
+              <span class="nav-desc text-[10px] truncate">Store metrics & sales</span>
+            </div>
+            {% if active_view == 'dashboard' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/reports" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'reports' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Reports & Analytics</span>
+              <span class="nav-desc text-[10px] truncate">Revenue & hourly stats</span>
+            </div>
+            {% if active_view == 'reports' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+        </div>
+
+        <!-- SECTION 2: COMMERCE & CATALOG -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Commerce & Store</span>
+          </div>
+
+          <a href="/products" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'products' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="package" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Products Catalog</span>
+              <span class="nav-desc text-[10px] truncate">SKUs, pricing & tags</span>
+            </div>
+            {% if active_view == 'products' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/inventory" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'inventory' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="boxes" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Inventory Stock</span>
+              <span class="nav-desc text-[10px] truncate">Stock adjustments</span>
+            </div>
+            {% if active_view == 'inventory' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/orders" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'orders' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Orders & Sales</span>
+              <span class="nav-desc text-[10px] truncate">Transactions history</span>
+            </div>
+            {% if active_view == 'orders' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/invoices" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'invoices' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="file-text" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Invoices & Receipts</span>
+              <span class="nav-desc text-[10px] truncate">Thermal print & PDF</span>
+            </div>
+            {% if active_view == 'invoices' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/customers" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'customers' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Customers CRM</span>
+              <span class="nav-desc text-[10px] truncate">Loyalty points & tiers</span>
+            </div>
+            {% if active_view == 'customers' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+        </div>
+
+        <!-- SECTION 3: SYSTEM ADMINISTRATION -->
+        <div class="space-y-1">
+          <div class="px-3 pb-1 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Settings & Admin</span>
+          </div>
+
+          {% if session.user_role == 'admin' %}
+          <a href="/users" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'users' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Staff Accounts</span>
+              <span class="nav-desc text-[10px] truncate">Roles & permissions</span>
+            </div>
+            {% if active_view == 'users' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+
+          <a href="/backup" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'backup' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="hard-drive" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Database Backup</span>
+              <span class="nav-desc text-[10px] truncate">Snapshots & Google Drive</span>
+            </div>
+            {% if active_view == 'backup' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+          {% endif %}
+
+          <a href="/settings" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'settings' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
+              <i data-lucide="settings" class="w-4 h-4"></i>
+            </div>
+            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
+              <span class="font-semibold text-[12.5px] truncate">Store Settings</span>
+              <span class="nav-desc text-[10px] truncate">Tax, receipt & currency</span>
+            </div>
+            {% if active_view == 'settings' %}
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+            {% endif %}
+          </a>
+        </div>
+
+      </nav>
+
+      <!-- PWA Download & Offline Feature Card -->
+      <div class="px-3 py-2.5 border-t border-gray-800/80 bg-gray-900/30 shrink-0">
+        <div class="p-2.5 rounded-xl bg-gradient-to-br from-gray-800/70 via-gray-800/40 to-gray-900/80 border border-gray-700/60 shadow-sm">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 grid place-items-center">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+              </div>
+              <span class="text-xs font-semibold text-gray-200">Progressive App</span>
+            </div>
+            <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PWA</span>
+          </div>
+          <p class="text-[10px] text-gray-400 leading-snug mb-2">Install on desktop or mobile for instant offline checkout.</p>
+          <button id="pwaSidebarBtn" onclick="triggerPwaInstall()" class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold transition-all">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span class="truncate">Install Pulse POS</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- User Profile & Session Footer -->
+      <div class="p-3 border-t border-gray-800/80 bg-[#090d16] shrink-0">
+        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-gray-800/40 border border-gray-800 hover:border-gray-700 transition-colors">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-bold text-xs grid place-items-center ring-2 ring-emerald-500/20 shrink-0">
+              {{ (session.user_name or 'U')[:2] | upper }}
+              <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-gray-900"></span>
+            </div>
+            <div class="flex flex-col leading-tight min-w-0">
+              <span class="text-xs font-semibold text-gray-200 truncate">{{ session.user_name or 'User' }}</span>
+              <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5">
+                <span class="capitalize px-1.5 py-0.2 rounded font-medium {% if session.user_role == 'admin' %}bg-purple-950/70 text-purple-300 border border-purple-800/60{% elif session.user_role == 'manager' %}bg-blue-950/70 text-blue-300 border border-blue-800/60{% else %}bg-emerald-950/70 text-emerald-300 border border-emerald-800/60{% endif %}">{{ session.user_role or 'cashier' }}</span>
+                <span class="text-gray-600">·</span>
+                <span class="text-emerald-400 flex items-center gap-0.5" title="Active 30-day persistent session"><i data-lucide="shield-check" class="w-2.5 h-2.5"></i> 30d</span>
+              </div>
+            </div>
+          </div>
+          <a href="/logout" class="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Sign Out">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+      <!-- Header -->
+      <header class="flex items-center gap-3 sm:gap-4 h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
+        <!-- Mobile hamburger toggle button -->
+        <button id="mobileSidebarToggle" onclick="toggleMobileSidebar()" class="lg:hidden grid place-items-center w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shrink-0" title="Toggle Navigation">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div class="flex flex-col leading-tight min-w-0">
+          <h1 id="page-title" class="text-base sm:text-lg font-bold tracking-tight truncate">{% block page_title %}{% endblock %}</h1>
+          <p id="page-subtitle" class="text-xs text-gray-500 dark:text-gray-400 truncate">{% block page_subtitle %}{% endblock %}</p>
+        </div>
+        <div class="flex-1"></div>
+        <div id="clock" class="hidden lg:flex flex-col items-end leading-tight shrink-0">
+          <span class="text-sm font-semibold tabular-nums" id="clock-time">--:--:--</span>
+          <span class="text-[11px] text-gray-500" id="clock-date">Loading...</span>
+        </div>
+        <!-- Online/Offline connection badge -->
+        <div id="networkBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Online</span>
+        </div>
+        <!-- PWA Download / Install App Header Action -->
+        <button id="pwaInstallBtn" onclick="triggerPwaInstall()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-500 hover:bg-primary-600 text-white shadow-sm transition-all hover:shadow active:scale-95 shrink-0" title="Install Pulse POS as Desktop / Mobile App">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span class="hidden md:inline">Install App</span>
+        </button>
+        <button onclick="toggleTheme()" class="grid place-items-center w-9 h-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0" title="Toggle theme">
+          <i data-lucide="moon" class="w-[18px] h-[18px] dark:hidden"></i>
+          <i data-lucide="sun" class="w-[18px] h-[18px] hidden dark:block"></i>
+        </button>
+        <button onclick="document.documentElement.requestFullscreen?.()" class="grid place-items-center w-9 h-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0" title="Fullscreen">
+          <i data-lucide="maximize-2" class="w-[18px] h-[18px]"></i>
+        </button>
+      </header>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+            {% for category, message in messages %}
+              <div class="flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-slide-in
+                {% if category == 'error' %}bg-red-500 text-white{% elif category == 'success' %}bg-emerald-500 text-white{% else %}bg-gray-800 text-white{% endif %}">
+                <i data-lucide="{% if category == 'error' %}alert-circle{% elif category == 'success' %}check-circle{% else %}info{% endif %}" class="w-4 h-4 shrink-0"></i>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Main content -->
+      <main class="flex-1 overflow-y-auto pos-scroll bg-gray-50 dark:bg-gray-950">
+        <div id="app">
+        {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script data-app="base">
+    // Initialize Lucide icons
+    if (window.lucide) lucide.createIcons();
+
+    // Theme toggle
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('quickpos-theme', isDark ? 'dark' : 'light');
+    }
+
+    // Live clock
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const date = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeEl = document.getElementById('clock-time');
+      const dateEl = document.getElementById('clock-date');
+      if (timeEl) timeEl.textContent = time;
+      if (dateEl) dateEl.textContent = date;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Toggle Sales submenu
+    function toggleSales(e) {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const sub = document.getElementById('salesSubmenu');
+      const chevron = btn.querySelector('[data-lucide="chevron-down"]');
+      const isOpen = sub.classList.contains('max-h-0');
+      sub.classList.toggle('max-h-0');
+      if (chevron) chevron.classList.toggle('rotate-180');
+      localStorage.setItem('quickpos-sales-open', isOpen ? '1' : '0');
+    }
+    // Restore Sales submenu state from localStorage
+    (function() {
+      const saved = localStorage.getItem('quickpos-sales-open');
+      if (saved === '1') {
+        const sub = document.getElementById('salesSubmenu');
+        const chevron = document.querySelector('#salesSubmenu')?.previousElementSibling?.querySelector('[data-lucide="chevron-down"]');
+        if (sub) sub.classList.remove('max-h-0');
+        if (chevron) chevron.classList.add('rotate-180');
+      }
+    })();
+
+    // Auto-dismiss flash messages after 3s
+    setTimeout(() => {
+      document.querySelectorAll('.animate-slide-in').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(100%)';
+        setTimeout(() => el.remove(), 300);
+      });
+    }, 3500);
+  </script>
+
+  <script data-app="base">
+  // SPA navigation — intercept links & forms, load pages without full refresh
+  (function () {
+    let isNavigating = false;
+
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href === '#' || href.startsWith('http') || href.startsWith('//')) return;
+      if (link.hasAttribute('download') || link.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+      e.preventDefault();
+      navigateTo(href);
+    });
+
+    document.addEventListener('submit', function (e) {
+      const form = e.target;
+      if (!form.matches('form')) return;
+      if (form.method && form.method.toLowerCase() === 'post') return;
+      if (form.querySelector('input[type="file"]')) return;
+      e.preventDefault();
+      const url = new URL(form.action || window.location.href);
+      new FormData(form).forEach((v, k) => url.searchParams.set(k, v));
+      navigateTo(url.pathname + url.search);
+    });
+
+    async function navigateTo(url) {
+      if (isNavigating) return;
+      isNavigating = true;
+      try {
+        // Destroy existing charts
+        if (typeof Chart !== 'undefined') {
+          document.querySelectorAll('canvas').forEach(function (c) {
+            var ch = Chart.getChart(c);
+            if (ch) ch.destroy();
+          });
+        }
+
+        var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!res.ok) { window.location.href = url; return; }
+        var html = await res.text();
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+
+        // Replace main content
+        var newApp = doc.getElementById('app');
+        if (!newApp) { window.location.href = url; return; }
+
+        // Extract page-specific scripts (not data-app="base") from new main content
+        var scripts = [];
+        var allScripts = newApp.querySelectorAll('script');
+        allScripts.forEach(function (s) { scripts.push(s); s.remove(); });
+
+        // Also extract scripts from the body that aren't base scripts
+        var bodyScripts = doc.body.querySelectorAll('script:not([data-app="base"])');
+        bodyScripts.forEach(function (s) {
+          // Avoid duplicates: check if this script src is already in scripts
+          if (s.src) {
+            var dup = scripts.some(function (es) { return es.src && es.src === s.src; });
+            if (!dup) scripts.push(s);
+          } else {
+            scripts.push(s);
+          }
+        });
+
+        var appEl = document.getElementById('app');
+        appEl.innerHTML = newApp.innerHTML;
+
+        // Update page header
+        var newTitle = doc.querySelector('title');
+        if (newTitle) document.title = newTitle.textContent;
+        var h1 = document.getElementById('page-title');
+        var sub = document.getElementById('page-subtitle');
+        var newH1 = doc.getElementById('page-title');
+        var newSub = doc.getElementById('page-subtitle');
+        if (h1 && newH1) h1.textContent = newH1.textContent;
+        if (sub && newSub) sub.textContent = newSub.textContent;
+
+        // Update sidebar active state
+        var sidebar = document.querySelector('nav');
+        var path = url.split('?')[0];
+        var salesKeys = ['products','orders','invoices','inventory','customers'];
+        var inSales = salesKeys.some(function (k) { return path.startsWith('/' + k); });
+        sidebar.querySelectorAll('a').forEach(function (a) {
+          var ah = a.getAttribute('href');
+          if (ah === '/users') { a.style.display = ''; } // ignore
+          var isTopNav = a.closest('[id="salesSubmenu"]') === null;
+          var active = ah === '/' ? path === '/' : ah !== '/' && path.startsWith(ah);
+          if (active) {
+            a.className = (isTopNav ? 'group w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all bg-primary-500 text-white shadow-sm' : 'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all bg-primary-600 text-white shadow-sm');
+          } else {
+            a.className = (isTopNav ? 'group w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-gray-300 hover:bg-gray-800 hover:text-white' : 'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all text-gray-400 hover:bg-gray-800 hover:text-white');
+          }
+        });
+        // Update Sales parent button
+        var salesBtn = sidebar.querySelector('button[onclick*="toggleSales"]');
+        if (salesBtn) {
+          if (inSales) {
+            salesBtn.className = 'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left bg-primary-500 text-white shadow-sm';
+          } else {
+            salesBtn.className = 'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left text-gray-300 hover:bg-gray-800 hover:text-white';
+          }
+        }
+        // Auto-open Sales submenu if inside it
+        if (inSales) {
+          var sub = document.getElementById('salesSubmenu');
+          var chevron = document.querySelector('#salesSubmenu')?.previousElementSibling?.querySelector('[data-lucide="chevron-down"]');
+          if (sub) sub.classList.remove('max-h-0');
+          if (chevron) chevron.classList.add('rotate-180');
+          localStorage.setItem('quickpos-sales-open', '1');
+        }
+
+        // Push new URL state
+        history.pushState({ url: url }, '', url);
+
+        // Re-execute scripts
+        scripts.forEach(function (old) {
+          var s = document.createElement('script');
+          if (old.src) { s.src = old.src; }
+          else { s.textContent = old.textContent; }
+          document.body.appendChild(s);
+        });
+
+        // Re-init Lucide
+        if (window.lucide) lucide.createIcons();
+      } catch (e) {
+        window.location.href = url;
+      } finally {
+        isNavigating = false;
+      }
+    }
+
+    // Handle back/forward
+    window.addEventListener('popstate', function (e) {
+      if (e.state && e.state.url) {
+        navigateTo(e.state.url);
+      }
+    });
+  })();
+  </script>
+  <!-- PWA Install & Download Modal -->
+  <div id="pwaInstallModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div class="relative p-6 text-center bg-gradient-to-b from-primary-500/10 to-transparent">
+        <button onclick="closePwaModal()" class="absolute top-4 right-4 grid place-items-center w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+        <img src="{{ url_for('static', filename='images/pulse-logo-icon.svg') }}" alt="Pulse POS" class="w-16 h-16 rounded-2xl shadow-lg mx-auto mb-3" />
+        <h3 id="pwaModalTitle" class="text-xl font-bold tracking-tight">Download Pulse POS</h3>
+        <p id="pwaModalDesc" class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">Install as a native desktop or mobile app for offline access, fast checkout, and keyboard shortcuts.</p>
+      </div>
+      <div class="px-6 py-4 space-y-4">
+        <!-- Feature Highlights -->
+        <div class="grid grid-cols-3 gap-2 py-2 border-y border-gray-100 dark:border-gray-800 text-center">
+          <div class="p-2">
+            <i data-lucide="zap" class="w-4 h-4 mx-auto mb-1 text-primary-500"></i>
+            <p class="text-[11px] font-semibold">Instant Launch</p>
+            <p class="text-[10px] text-gray-400">Zero loading delay</p>
+          </div>
+          <div class="p-2">
+            <i data-lucide="wifi-off" class="w-4 h-4 mx-auto mb-1 text-primary-500"></i>
+            <p class="text-[11px] font-semibold">Offline Ready</p>
+            <p class="text-[10px] text-gray-400">Never stops running</p>
+          </div>
+          <div class="p-2">
+            <i data-lucide="shield-check" class="w-4 h-4 mx-auto mb-1 text-primary-500"></i>
+            <p class="text-[11px] font-semibold">30-Day Session</p>
+            <p class="text-[10px] text-gray-400">Secure & persistent</p>
+          </div>
+        </div>
+
+        <!-- Dynamic Platform Instructions -->
+        <div id="pwaPlatformInstructions" class="bg-gray-50 dark:bg-gray-800/60 rounded-xl p-3.5 border border-gray-200 dark:border-gray-700/60">
+        </div>
+      </div>
+      <div class="p-6 pt-0 flex gap-2.5">
+        <button onclick="closePwaModal()" class="flex-1 h-10 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold transition-colors">Close</button>
+        <button id="pwaModalActionBtn" onclick="triggerPwaInstall()" class="flex-1 h-10 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Install Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

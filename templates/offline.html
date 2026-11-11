@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — Pulse POS</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{DEFAULT:'#10b981',50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b'}},fontFamily:{sans:['Inter','system-ui','sans-serif'],mono:['ui-monospace','SFMono-Regular','monospace']}}}}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>body{font-family:'Inter',system-ui,sans-serif}</style>
+  <script>(function(){const t=localStorage.getItem('pulsepos-theme')||localStorage.getItem('quickpos-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md text-center">
+    <div class="relative inline-block mb-6">
+      <img src="/static/images/pulse-logo-icon.svg" alt="Pulse POS" class="w-20 h-20 rounded-2xl shadow-xl mx-auto" />
+      <div class="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1.5 shadow-md">
+        <i data-lucide="wifi-off" class="w-4 h-4"></i>
+      </div>
+    </div>
+    
+    <h1 class="text-2xl font-bold tracking-tight mb-2">You are currently offline</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+      Pulse POS is running in offline mode. Please check your network connection. Any cached data and transactions will sync automatically once reconnected.
+    </p>
+
+    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6 text-left shadow-sm">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 grid place-items-center">
+          <i data-lucide="hard-drive" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-gray-900 dark:text-gray-100">Progressive Web App Ready</p>
+          <p class="text-[11px] text-gray-500">Local assets and terminal shell are preserved</p>
+        </div>
+      </div>
+      <div class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-primary-500"></i>
+          <span>Core POS application cached locally</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-primary-500"></i>
+          <span>Connection auto-detection enabled</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <button onclick="window.location.reload()" class="h-10 px-5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        <span>Try Reconnecting</span>
+      </button>
+      <button onclick="window.location.href='/pos'" class="h-10 px-5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+        <span>Go to POS Terminal</span>
+      </button>
+    </div>
+
+    <p class="text-[11px] text-gray-400 mt-8">Pulse POS &mdash; Enterprise Point of Sale</p>
+  </div>
+  <script>
+    if (window.lucide) lucide.createIcons();
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
+

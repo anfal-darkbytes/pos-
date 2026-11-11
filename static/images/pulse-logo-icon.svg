@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="pulseBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="pulseStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#ecfdf5" />
+    </linearGradient>
+    <filter id="pulseGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#047857" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Rounded Base Squircle -->
+  <rect width="48" height="48" rx="14" fill="url(#pulseBg)" />
+
+  <!-- Inner Stroke Highlight -->
+  <rect x="1" y="1" width="46" height="46" rx="13" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.2" />
+
+  <!-- Pulse Waveform -->
+  <path d="M 8.5 25.5 H 15 L 18.5 32 L 25 13 L 30 35 L 34 22 L 37 25.5 H 40.5" 
+        stroke="url(#pulseStroke)" 
+        stroke-width="3" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        filter="url(#pulseGlow)" />
+
+  <!-- Apex Beacon Dot -->
+  <circle cx="25" cy="13" r="2.2" fill="#ffffff" />
+  <circle cx="25" cy="13" r="4" stroke="#ffffff" stroke-width="1" stroke-opacity="0.5" />
+</svg>
+
