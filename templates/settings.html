@@ -42,7 +42,7 @@
         </div>
         <div>
           <label class="text-xs font-medium block mb-1">Symbol</label>
-          <input name="currency_symbol" id="symbolInput" value="{{ settings.currency_symbol }}" maxlength="3" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" />
+          <input name="currency_symbol" id="symbolInput" value="{{ settings.currency_symbol }}" maxlength="10" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" />
           <p class="text-[11px] text-gray-500 mt-1">Shown on prices & receipts</p>
         </div>
       </div>
@@ -93,34 +93,6 @@
       </div>
     </div>
 
-    <!-- SMTP / Email -->
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="grid place-items-center w-10 h-10 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"><i data-lucide="mail" class="w-5 h-5"></i></div>
-        <div><h3 class="font-semibold text-base">Email / SMTP</h3><p class="text-xs text-gray-500">Used to send password reset OTPs to staff</p></div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label class="text-xs font-medium block mb-1">SMTP Host</label><input name="smtp_host" value="{{ settings.smtp_host or '' }}" placeholder="smtp.gmail.com" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" /></div>
-        <div><label class="text-xs font-medium block mb-1">SMTP Port</label><input name="smtp_port" value="{{ settings.smtp_port or '' }}" placeholder="587" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" /></div>
-        <div><label class="text-xs font-medium block mb-1">SMTP Username</label><input name="smtp_user" value="{{ settings.smtp_user or '' }}" placeholder="user@gmail.com" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" /></div>
-        <div><label class="text-xs font-medium block mb-1">SMTP Password</label><input name="smtp_pass" type="password" value="{{ settings.smtp_pass or '' }}" placeholder="App password" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" /></div>
-        <div class="md:col-span-2"><label class="text-xs font-medium block mb-1">From Email</label><input name="smtp_from_email" value="{{ settings.smtp_from_email or '' }}" placeholder="noreply@quickpos.store" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" /></div>
-      </div>
-      <p class="text-[11px] text-gray-500 mt-2">For Gmail use <strong>smtp.gmail.com</strong> port <strong>587</strong> with an <a href="https://support.google.com/accounts/answer/185833" target="_blank" class="text-primary-500 underline">App Password</a>.</p>
-    </div>
-
-    <!-- Google Drive -->
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="grid place-items-center w-10 h-10 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"><i data-lucide="cloud" class="w-5 h-5"></i></div>
-        <div><h3 class="font-semibold text-base">Google Drive</h3><p class="text-xs text-gray-500">Upload backups to Google Drive</p></div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="md:col-span-2"><label class="text-xs font-medium block mb-1">Client ID</label><input name="gdrive_client_id" value="{{ settings.gdrive_client_id or '' }}" placeholder="123456789-xxxxx.apps.googleusercontent.com" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono text-xs" /></div>
-        <div class="md:col-span-2"><label class="text-xs font-medium block mb-1">Client Secret</label><input name="gdrive_client_secret" value="{{ settings.gdrive_client_secret or '' }}" placeholder="GOCSPX-xxxxxxxxxxxxxxxxxxxx" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono text-xs" /></div>
-      </div>
-      <p class="text-[11px] text-gray-500 mt-2">Create a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-primary-500 underline">Google Cloud OAuth 2.0 Client ID</a> of type "Desktop app" with the Drive API enabled.</p>
-    </div>
   </form>
 
   <!-- Bank & Wallet Accounts Management -->
@@ -445,7 +417,7 @@
     const sel = document.getElementById('currencySelect');
     if (!sel) return;
     const opt = sel.options[sel.selectedIndex];
-    const sym = opt ? opt.dataset.symbol : '$';
+    const sym = opt ? (opt.dataset.symbol || '$') : '$';
     const symInput = document.getElementById('symbolInput');
     if (symInput) symInput.value = sym;
     const p1 = document.getElementById('preview1');
@@ -454,6 +426,7 @@
     if (p2) p2.textContent = sym + '1,250.00';
     const pCode = document.getElementById('previewCode');
     if (pCode) pCode.textContent = sel.value;
+    updateReceiptPreview();
   }
 
   function updateReceiptPreview() {
@@ -471,15 +444,44 @@
     const receipt = document.querySelector('.font-mono.text-xs.text-center');
     if (receipt) {
       receipt.querySelectorAll('p').forEach(p => {
-        if (p.textContent.includes('—')) p.innerHTML = p.innerHTML.replace(/[€$£¥₹]+/g, sym);
+        if (p.textContent.includes('—')) p.innerHTML = p.innerHTML.replace(/[^\d\w\s—\.\,\:\(\)\%\*]+/g, sym);
       });
     }
   }
 
-  // Live update receipt preview on input
-  document.querySelectorAll('input, textarea').forEach(el => {
+  // Live update receipt & currency preview on input
+  document.querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', updateReceiptPreview);
+    el.addEventListener('change', updateReceiptPreview);
   });
+
+  const symInput = document.getElementById('symbolInput');
+  if (symInput) {
+    symInput.addEventListener('input', function () {
+      const sym = this.value || '$';
+      const p1 = document.getElementById('preview1');
+      if (p1) p1.textContent = sym + '19.99';
+      const p2 = document.getElementById('preview2');
+      if (p2) p2.textContent = sym + '1,250.00';
+      updateReceiptPreview();
+    });
+  }
+
+  const settingsForm = document.getElementById('settingsForm');
+  if (settingsForm) {
+    settingsForm.addEventListener('submit', function () {
+      const sel = document.getElementById('currencySelect');
+      const sIn = document.getElementById('symbolInput');
+      const cur = sel ? sel.value : 'USD';
+      const sym = sIn ? sIn.value : '$';
+      try {
+        window.currencySymbol = sym;
+        window.currencyCode = cur;
+        localStorage.setItem('quickpos-currency-symbol', sym);
+        localStorage.setItem('quickpos-currency-code', cur);
+      } catch (e) {}
+    });
+  }
 
   // ── Payment Accounts Management ──────────────────────────────────
   const bankPresets = ['Meezan Bank', 'Allied Bank', 'HBL Bank', 'UBL', 'MCB Bank', 'Bank Alfalah', 'Askari Bank', 'Standard Chartered'];

@@ -3,9 +3,83 @@ var cart = window.posCart || [];
 window.posCart = cart;
 var selectedCustomer = window.posSelectedCustomer || null;
 var selectedPayment = window.posSelectedPayment || 'cash';
-var currencySymbol = window.currencySymbol || '$';
+function getCurrencySymbol() {
+  var sym = window.currencySymbol;
+  if (!sym) {
+    try {
+      sym = localStorage.getItem('quickpos-currency-symbol');
+    } catch (e) {}
+  }
+  return sym || '$';
+}
+window.getCurrencySymbol = getCurrencySymbol;
+
+var currencySymbol = getCurrencySymbol();
 window.posPaymentMode = window.posPaymentMode || 'full'; // 'full' | 'split'
 var emptyEl = null;
+
+function applyCurrencyChange(newSymbol) {
+  if (!newSymbol) newSymbol = getCurrencySymbol();
+  window.currencySymbol = newSymbol;
+  currencySymbol = newSymbol;
+  try {
+    localStorage.setItem('quickpos-currency-symbol', newSymbol);
+  } catch (e) {}
+
+  // 1. Update all static currency symbol indicator spans in DOM
+  document.querySelectorAll('.currency-symbol-label').forEach(function (el) {
+    el.textContent = newSymbol;
+  });
+
+  // 2. Update catalog product cards in DOM
+  document.querySelectorAll('.product-card-price').forEach(function (el) {
+    var rawPrice = parseFloat(el.dataset.price || 0);
+    el.textContent = newSymbol + rawPrice.toFixed(2);
+  });
+
+  // 3. Re-render active cart and recalculate totals
+  if (typeof renderCart === 'function') {
+    renderCart();
+  }
+
+  // 4. Update checkout displays if open
+  var coTotalEl = document.getElementById('coTotal');
+  var coSubtotalEl = document.getElementById('coSubtotal');
+  var coTaxEl = document.getElementById('coTax');
+  var coPayBtnAmount = document.getElementById('coPayBtnAmount');
+  var cashDueText = document.getElementById('cashDueText');
+  var fullBankTotalDisplay = document.getElementById('fullBankTotalDisplay');
+  var fullWalletTotalDisplay = document.getElementById('fullWalletTotalDisplay');
+
+  var currentCart = window.posCart || [];
+  var subtotal = currentCart.reduce(function (s, i) { return s + i.price * i.quantity; }, 0);
+  var taxRate = typeof window.taxRate === 'number' ? window.taxRate : 8.25;
+  var tax = Math.round(subtotal * taxRate / 100 * 100) / 100;
+  var discIn = document.getElementById('discountInput');
+  var discount = Math.max(0, parseFloat(discIn ? discIn.value : 0) || 0);
+  var total = Math.max(0, Math.round((subtotal + tax - discount) * 100) / 100);
+
+  if (coTotalEl) coTotalEl.textContent = newSymbol + total.toFixed(2);
+  if (coSubtotalEl) coSubtotalEl.textContent = newSymbol + subtotal.toFixed(2);
+  if (coTaxEl) coTaxEl.textContent = newSymbol + tax.toFixed(2);
+  if (coPayBtnAmount) coPayBtnAmount.textContent = newSymbol + total.toFixed(2);
+  if (cashDueText) cashDueText.textContent = newSymbol + total.toFixed(2);
+  if (fullBankTotalDisplay) fullBankTotalDisplay.textContent = newSymbol + total.toFixed(2);
+  if (fullWalletTotalDisplay) fullWalletTotalDisplay.textContent = newSymbol + total.toFixed(2);
+}
+window.applyCurrencyChange = applyCurrencyChange;
+window.updateTotals = function () { if (typeof renderCart === 'function') renderCart(); };
+
+window.addEventListener('pulsepos:settings-updated', function (e) {
+  if (e.detail && e.detail.currency_symbol) {
+    applyCurrencyChange(e.detail.currency_symbol);
+  }
+});
+window.addEventListener('pulsepos:catalog-updated', function (e) {
+  if (e.detail && e.detail.settings && e.detail.settings.currency_symbol) {
+    applyCurrencyChange(e.detail.settings.currency_symbol);
+  }
+});
 
 function addToCart(productId, name, price, cost, stock) {
   if (!productId) return;
@@ -185,24 +259,37 @@ function renderCart() {
   const countEl = document.getElementById('cartCount');
   const clearBtn = document.getElementById('clearBtn');
   const chargeBtn = document.getElementById('chargeBtn');
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
 
   cart = window.posCart || [];
+  const scrollContainer = document.getElementById('cartScrollContainer');
 
   if (cart.length === 0) {
+    if (scrollContainer) {
+      scrollContainer.classList.add('flex-1');
+      scrollContainer.classList.remove('shrink');
+    }
     cartEl.innerHTML = `
-      <div id="emptyCart" class="flex flex-col items-center justify-center text-center p-6 py-16 text-gray-400">
+      <div id="emptyCart" class="flex flex-col items-center justify-center text-center p-6 py-14 text-gray-400">
         <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/60 grid place-items-center mb-3 shadow-inner">
           <i data-lucide="shopping-bag" class="w-8 h-8 text-gray-400 dark:text-gray-500"></i>
         </div>
         <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">Active Cart is Empty</p>
         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[220px]">Scan a barcode or tap products from the catalog to begin</p>
+        <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Ready for Next Sale</span>
+        </div>
       </div>
     `;
     if (countEl) countEl.classList.add('hidden');
     if (clearBtn) clearBtn.classList.add('hidden');
     if (chargeBtn) chargeBtn.disabled = true;
   } else {
+    if (scrollContainer) {
+      scrollContainer.classList.remove('flex-1');
+      scrollContainer.classList.add('shrink');
+    }
     if (countEl) countEl.classList.remove('hidden');
     if (clearBtn) clearBtn.classList.remove('hidden');
     if (chargeBtn) chargeBtn.disabled = false;
@@ -373,7 +460,7 @@ function setCategory(catId) {
 // Checkout flow — dedicated checkout screen
 function openCheckout() {
   if (cart.length === 0) return;
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
 
   const regView = document.getElementById('posRegisterView');
   const coView = document.getElementById('posCheckoutView');
@@ -588,7 +675,7 @@ function setPaymentMode(mode) {
     if (fullContainer) fullContainer.classList.remove('hidden');
     if (splitContainer) splitContainer.classList.add('hidden');
 
-    const sym = window.currencySymbol || currencySymbol || '$';
+    const sym = getCurrencySymbol();
     const totalEl = document.getElementById('coTotal');
     const total = parseFloat(totalEl ? totalEl.textContent.replace(sym, '') : '0') || 0;
     const processBtn = document.getElementById('processBtn');
@@ -644,7 +731,7 @@ function onWalletSelectChange() {
 }
 
 function fillSplitRemaining(method) {
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const totalEl = document.getElementById('coTotal');
   const total = parseFloat(totalEl ? totalEl.textContent.replace(sym, '') : '0') || 0;
 
@@ -674,7 +761,7 @@ function fillSplitRemaining(method) {
 }
 
 function updateSplitMath(method) {
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const totalEl = document.getElementById('coTotal');
   const total = parseFloat(totalEl ? totalEl.textContent.replace(sym, '') : '0') || 0;
 
@@ -823,7 +910,7 @@ function setPayment(method) {
   if (bankSec) bankSec.classList.toggle('hidden', method !== 'bank');
   if (walletSec) walletSec.classList.toggle('hidden', method !== 'wallet');
 
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const totalEl = document.getElementById('coTotal');
   const total = parseFloat(totalEl ? totalEl.textContent.replace(sym, '') : '0') || 0;
 
@@ -861,7 +948,7 @@ function selectQuickCash(amount) {
 }
 
 function updateChange() {
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const coTotalEl = document.getElementById('coTotal');
   const total = parseFloat(coTotalEl ? coTotalEl.textContent.replace(sym, '') : '0') || 0;
   const paidInput = document.getElementById('paidAmount');
@@ -950,7 +1037,7 @@ async function recordAndEnqueueSale(payload, subtotal, tax, discount, total, cli
 }
 
 async function processSale() {
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const totalEl = document.getElementById('coTotal');
   const total = parseFloat(totalEl ? totalEl.textContent.replace(sym, '') : '0') || 0;
   const isSplit = (window.posPaymentMode === 'split');
@@ -1180,7 +1267,7 @@ function syncOfflineOrders() {
 }
 
 function showReceipt(order) {
-  const sym = window.currencySymbol || currencySymbol || '$';
+  const sym = getCurrencySymbol();
   const ordNumEl = document.getElementById('receiptOrderNumber');
   if (ordNumEl) {
     ordNumEl.textContent = (order.is_offline ? 'Offline Order ' : 'Order ') + order.order_number;
@@ -1321,7 +1408,15 @@ window.initPos = function () {
     );
   }
 
-  // 5. Render active cart
+  // 5. Synchronize authoritative currency symbol and render active cart
+  applyCurrencyChange(getCurrencySymbol());
+  if (window.PulseRepos && window.PulseRepos.settings) {
+    window.PulseRepos.settings.get().then(function (st) {
+      if (st && st.currency_symbol) {
+        applyCurrencyChange(st.currency_symbol);
+      }
+    }).catch(function () {});
+  }
   renderCart();
 
   // 6. Update sync UI status

@@ -80,7 +80,7 @@
           <div class="p-2.5">
             <p class="text-xs font-medium line-clamp-2 leading-tight min-h-[2rem]">{{ p.name }}</p>
             <div class="mt-1.5 flex items-center justify-between">
-              <span class="text-sm font-bold text-primary-600">{{ p.price | money }}</span>
+              <span class="text-sm font-bold text-primary-600 product-card-price" data-price="{{ p.price }}">{{ p.price | money }}</span>
               <span class="text-[10px] text-gray-500 tabular-nums">{{ p.stock }} {{ p.unit }}</span>
             </div>
           </div>
@@ -173,85 +173,88 @@
           data-lucide="alert-circle" class="w-3 h-3 text-gray-400"></i> No customers matching</div>
     </div>
 
-    <!-- Cart Items Scroll Area -->
-    <div id="cartScrollContainer" class="flex-1 min-h-0 overflow-y-auto pos-scroll bg-gray-50/30 dark:bg-gray-900/30">
-      <div id="cart" class="p-3.5 space-y-2.5">
-        <div id="emptyCart" class="flex flex-col items-center justify-center text-center p-6 py-16 text-gray-400">
-          <div
-            class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/60 grid place-items-center mb-3 shadow-inner">
-            <i data-lucide="shopping-bag" class="w-8 h-8 text-gray-400 dark:text-gray-500"></i>
-          </div>
-          <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">Active Cart is Empty</p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[220px]">Scan a barcode or tap products from the
-            catalog to begin</p>
-          <div
-            class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Ready for Next Sale</span>
+    <!-- Cart Body: Items + Flowing Totals Panel (moves down with items, docks at bottom when full) -->
+    <div class="flex-1 min-h-0 flex flex-col justify-start overflow-hidden bg-gray-50/30 dark:bg-gray-900/30">
+      <!-- Cart Items Scroll Area -->
+      <div id="cartScrollContainer" class="flex-1 min-h-0 overflow-y-auto pos-scroll">
+        <div id="cart" class="p-3.5 space-y-2.5">
+          <div id="emptyCart" class="flex flex-col items-center justify-center text-center p-6 py-14 text-gray-400">
+            <div
+              class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/60 grid place-items-center mb-3 shadow-inner">
+              <i data-lucide="shopping-bag" class="w-8 h-8 text-gray-400 dark:text-gray-500"></i>
+            </div>
+            <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">Active Cart is Empty</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[220px]">Scan a barcode or tap products from the
+              catalog to begin</p>
+            <div
+              class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Ready for Next Sale</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Totals & Checkout Panel (Fixed/Pinned at bottom) -->
-    <div
-      class="border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 backdrop-blur-xs shrink-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
-      <div class="px-5 py-3.5 space-y-2">
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-gray-500 dark:text-gray-400 font-medium">Subtotal</span>
-          <span id="subtotal" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
-        </div>
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
-            <span>Tax</span>
-            <span
-              class="text-[10px] font-mono bg-gray-200/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-semibold">{{
-              settings.tax_rate }}%</span>
-          </span>
-          <span id="tax" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
-        </div>
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
-            <i data-lucide="tag" class="w-3.5 h-3.5 text-gray-400"></i>
-            <span>Discount</span>
-          </span>
-          <div class="relative flex items-center">
-            <span class="absolute left-2.5 text-xs font-semibold text-gray-400 pointer-events-none select-none">{{
-              settings.currency_symbol }}</span>
-            <input id="discountInput" type="number" min="0" step="0.01" value="0" oninput="updateTotals()"
-              placeholder="0.00"
-              class="w-24 h-7 pl-6 pr-2 text-right text-xs font-semibold tabular-nums rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all" />
+      <!-- Totals & Checkout Panel (Flows down with items, docks at bottom when full) -->
+      <div id="cartTotalsPanel"
+        class="border-t border-b border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 backdrop-blur-xs shrink-0 z-10 shadow-xs transition-all duration-200">
+        <div class="px-5 py-3.5 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-500 dark:text-gray-400 font-medium">Subtotal</span>
+            <span id="subtotal" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
           </div>
-        </div>
-        <div
-          class="border-t border-gray-200/80 dark:border-gray-700/80 pt-2.5 mt-1 flex items-baseline justify-between">
-          <div>
-            <span class="text-xs uppercase tracking-wider font-extrabold text-gray-500 dark:text-gray-400">Total
-              Due</span>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">Incl. all taxes</p>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
+              <span>Tax</span>
+              <span
+                class="text-[10px] font-mono bg-gray-200/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-semibold">{{
+                settings.tax_rate }}%</span>
+            </span>
+            <span id="tax" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
           </div>
-          <span id="total"
-            class="text-2xl font-black tabular-nums text-primary-600 dark:text-primary-400 tracking-tight">{{ 0 | money
-            }}</span>
-        </div>
-      </div>
-      <div class="px-5 pb-5">
-        <button id="chargeBtn" onclick="openCheckout()" disabled
-          class="w-full h-12 rounded-xl bg-gradient-to-r from-primary-600 via-emerald-600 to-teal-600 hover:from-primary-500 hover:to-teal-500 active:scale-[0.99] text-white font-bold shadow-lg shadow-primary-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100 transition-all flex items-center justify-between px-4 group cursor-pointer">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-white/20 grid place-items-center backdrop-blur-xs">
-              <i data-lucide="credit-card" class="w-4 h-4 text-white"></i>
-            </div>
-            <div class="text-left">
-              <span class="text-xs uppercase tracking-wider font-extrabold block leading-tight">Charge</span>
-              <span class="text-[10px] font-medium text-white/80 block leading-none">Space / Enter</span>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
+              <i data-lucide="tag" class="w-3.5 h-3.5 text-gray-400"></i>
+              <span>Discount</span>
+            </span>
+            <div class="relative flex items-center">
+              <span class="currency-symbol-label absolute left-2.5 text-xs font-semibold text-gray-400 pointer-events-none select-none">{{
+                settings.currency_symbol }}</span>
+              <input id="discountInput" type="number" min="0" step="0.01" value="0" oninput="updateTotals()"
+                placeholder="0.00"
+                class="w-24 h-7 pl-6 pr-2 text-right text-xs font-semibold tabular-nums rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all" />
             </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <span id="chargeAmount" class="text-lg font-black tabular-nums">{{ 0 | money }}</span>
-            <i data-lucide="chevron-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
+          <div
+            class="border-t border-gray-200/80 dark:border-gray-700/80 pt-2.5 mt-1 flex items-baseline justify-between">
+            <div>
+              <span class="text-xs uppercase tracking-wider font-extrabold text-gray-500 dark:text-gray-400">Total
+                Due</span>
+              <p class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">Incl. all taxes</p>
+            </div>
+            <span id="total"
+              class="text-2xl font-black tabular-nums text-primary-600 dark:text-primary-400 tracking-tight">{{ 0 | money
+              }}</span>
           </div>
-        </button>
+        </div>
+        <div class="px-5 pb-5">
+          <button id="chargeBtn" onclick="openCheckout()" disabled
+            class="w-full h-12 rounded-xl bg-gradient-to-r from-primary-600 via-emerald-600 to-teal-600 hover:from-primary-500 hover:to-teal-500 active:scale-[0.99] text-white font-bold shadow-lg shadow-primary-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100 transition-all flex items-center justify-between px-4 group cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-white/20 grid place-items-center backdrop-blur-xs">
+                <i data-lucide="credit-card" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="text-left">
+                <span class="text-xs uppercase tracking-wider font-extrabold block leading-tight">Charge</span>
+                <span class="text-[10px] font-medium text-white/80 block leading-none">Space / Enter</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span id="chargeAmount" class="text-lg font-black tabular-nums">{{ 0 | money }}</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -401,13 +404,13 @@
                   <i data-lucide="check" class="w-3 h-3"></i> Exact Auto-Filled
                 </span>
                 <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Total: <span
-                    id="cashDueText">$0.00</span></span>
+                    id="cashDueText">{{ 0 | money }}</span></span>
               </div>
             </div>
 
             <div class="space-y-1.5">
               <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400 select-none">{{
+                <span class="currency-symbol-label absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400 select-none">{{
                   settings.currency_symbol }}</span>
                 <input id="paidAmount" type="number" min="0" step="0.01" oninput="updateChange()" placeholder="0.00"
                   class="w-full text-2xl font-black tabular-nums h-14 rounded-xl border-2 border-emerald-500/40 dark:border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/15 pl-10 pr-4 text-gray-900 dark:text-white focus:border-emerald-600 focus:bg-white dark:focus:bg-gray-900 focus:ring-0 focus:outline-none transition-all" />
@@ -684,7 +687,7 @@
                 <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Cash Amount to
                   Pay</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                  <span class="currency-symbol-label absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
                     settings.currency_symbol }}</span>
                   <input type="number" min="0" step="0.01" id="splitCashAmount" oninput="updateSplitMath('cash')"
                     placeholder="0.00"
@@ -696,7 +699,7 @@
                 <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Cash Received (For
                   Change)</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                  <span class="currency-symbol-label absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
                     settings.currency_symbol }}</span>
                   <input type="number" min="0" step="0.01" id="splitCashTendered" oninput="updateSplitMath('cash')"
                     placeholder="0.00"
@@ -755,7 +758,7 @@
                 <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Bank Amount to
                   Pay</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                  <span class="currency-symbol-label absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
                     settings.currency_symbol }}</span>
                   <input type="number" min="0" step="0.01" id="splitBankAmount" oninput="updateSplitMath('bank')"
                     placeholder="0.00"
@@ -811,7 +814,7 @@
                 <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Wallet Amount to
                   Pay</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                  <span class="currency-symbol-label absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
                     settings.currency_symbol }}</span>
                   <input type="number" min="0" step="0.01" id="splitWalletAmount" oninput="updateSplitMath('wallet')"
                     placeholder="0.00"
@@ -958,6 +961,14 @@
 (function () {
   window.taxRate = {{ settings.tax_rate }};
   window.currencySymbol = "{{ settings.currency_symbol }}";
+  window.currencyCode = "{{ settings.currency }}";
+  try {
+    localStorage.setItem('quickpos-currency-symbol', "{{ settings.currency_symbol }}");
+    localStorage.setItem('quickpos-currency-code', "{{ settings.currency }}");
+  } catch (e) {}
+  if (typeof window.applyCurrencyChange === 'function') {
+    window.applyCurrencyChange("{{ settings.currency_symbol }}");
+  }
   window.storeName = "{{ settings.store_name | e }}";
   window.storeAddress = "{{ settings.address | e }}";
   window.storePhone = "{{ settings.phone | e }}";

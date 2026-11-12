@@ -32,15 +32,16 @@
             },
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
           },
         },
       },
     };
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
@@ -229,7 +230,7 @@
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
               <span class="nav-title font-semibold text-[12.5px] truncate">Database Backup</span>
-              <span class="nav-desc text-[10px] truncate">Snapshots & Google Drive</span>
+              <span class="nav-desc text-[10px] truncate">Snapshots & Local Backup</span>
             </div>
             {% if active_view == 'backup' %}
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
@@ -311,8 +312,11 @@
           <i data-lucide="moon" class="w-[18px] h-[18px] dark:hidden"></i>
           <i data-lucide="sun" class="w-[18px] h-[18px] hidden dark:block"></i>
         </button>
-        <button onclick="document.documentElement.requestFullscreen?.()" class="grid place-items-center w-9 h-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0" title="Fullscreen">
-          <i data-lucide="maximize-2" class="w-[18px] h-[18px]"></i>
+        <button id="fullscreenToggleBtn" type="button" onclick="toggleFullscreen()"
+          class="grid place-items-center w-9 h-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+          title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <i id="fullscreenMaximizeIcon" data-lucide="maximize-2" class="w-[18px] h-[18px]"></i>
+          <i id="fullscreenMinimizeIcon" data-lucide="minimize-2" class="w-[18px] h-[18px] hidden"></i>
         </button>
       </header>
 
@@ -341,6 +345,26 @@
   </div>
 
   <script data-app="base">
+    // Global Store Settings & Authoritative Currency
+    window.currencySymbol = "{{ settings.currency_symbol }}";
+    window.currencyCode = "{{ settings.currency }}";
+    window.storeName = "{{ settings.store_name | e }}";
+    window.storeAddress = "{{ settings.address | e }}";
+    window.storePhone = "{{ settings.phone | e }}";
+    window.receiptFooter = "{{ settings.receipt_footer | e }}";
+    window.taxRate = {{ settings.tax_rate }};
+
+    try {
+      localStorage.setItem('quickpos-currency-symbol', "{{ settings.currency_symbol }}");
+      localStorage.setItem('quickpos-currency-code', "{{ settings.currency }}");
+    } catch (e) {}
+
+    window.formatMoney = function (amount) {
+      const sym = window.currencySymbol || localStorage.getItem('quickpos-currency-symbol') || '$';
+      const val = parseFloat(amount) || 0;
+      return `${sym}${val.toFixed(2)}`;
+    };
+
     // Initialize Lucide icons
     if (window.lucide) lucide.createIcons();
 
@@ -349,6 +373,81 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('quickpos-theme', isDark ? 'dark' : 'light');
     }
+
+    // Fullscreen toggle & state handler
+    function isFullscreenActive() {
+      return !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+    }
+
+    function updateFullscreenUI() {
+      const isFull = isFullscreenActive();
+      const maxIcon = document.getElementById('fullscreenMaximizeIcon');
+      const minIcon = document.getElementById('fullscreenMinimizeIcon');
+      const btn = document.getElementById('fullscreenToggleBtn');
+
+      if (maxIcon && minIcon) {
+        if (isFull) {
+          maxIcon.classList.add('hidden');
+          minIcon.classList.remove('hidden');
+        } else {
+          maxIcon.classList.remove('hidden');
+          minIcon.classList.add('hidden');
+        }
+      }
+
+      if (btn) {
+        btn.title = isFull ? 'Exit Fullscreen (Esc)' : 'Enter Fullscreen (F11)';
+        btn.setAttribute('aria-label', isFull ? 'Exit Fullscreen' : 'Enter Fullscreen');
+        if (isFull) {
+          btn.classList.add('text-primary-600', 'dark:text-primary-400');
+        } else {
+          btn.classList.remove('text-primary-600', 'dark:text-primary-400');
+        }
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleFullscreen() {
+      try {
+        if (!isFullscreenActive()) {
+          const docEl = document.documentElement;
+          if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(function (err) { console.warn('[Fullscreen Request]', err); });
+          } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen();
+          } else if (docEl.mozRequestFullScreen) {
+            docEl.mozRequestFullScreen();
+          } else if (docEl.msRequestFullscreen) {
+            docEl.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(function (err) { console.warn('[Fullscreen Exit]', err); });
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      } catch (err) {
+        console.warn('[Fullscreen Toggle Error]', err);
+      }
+    }
+
+    window.toggleFullscreen = toggleFullscreen;
+    window.updateFullscreenUI = updateFullscreenUI;
+
+    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(function (evt) {
+      document.addEventListener(evt, updateFullscreenUI);
+    });
 
     // Live clock
     function updateClock() {

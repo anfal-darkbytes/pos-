@@ -7,7 +7,7 @@ from django.db.models import Model, QuerySet
 from django.forms.models import model_to_dict
 from django.templatetags.static import static
 from django.urls import reverse, NoReverseMatch
-from jinja2 import Environment
+from jinja2 import Environment, pass_context
 import markupsafe
 
 
@@ -37,13 +37,37 @@ class POSJSONEncoder(DjangoJSONEncoder):
         return super().default(o)
 
 
-def fmt_money(amount, symbol="$"):
+@pass_context
+def fmt_money(context, amount=0, symbol=None):
+    # Support direct invocation without Jinja context: fmt_money(amount, symbol)
+    if not isinstance(context, dict) and not hasattr(context, "get"):
+        val_arg = context
+        sym_arg = amount if isinstance(amount, str) else "$"
+        try:
+            val = float(val_arg or 0)
+        except (ValueError, TypeError):
+            val = 0.0
+        return f"{sym_arg}{val:,.2f}"
+
     if amount is None:
         amount = 0
     try:
         val = float(amount)
     except (ValueError, TypeError):
         val = 0.0
+
+    if symbol is None:
+        settings = context.get("settings") if hasattr(context, "get") else None
+        if isinstance(settings, dict):
+            symbol = settings.get("currency_symbol") or "$"
+        elif hasattr(settings, "currency_symbol"):
+            symbol = getattr(settings, "currency_symbol", "$") or "$"
+        else:
+            try:
+                from apps.core.models import StoreSettings
+                symbol = StoreSettings.get_settings().currency_symbol or "$"
+            except Exception:
+                symbol = "$"
     return f"{symbol}{val:,.2f}"
 
 

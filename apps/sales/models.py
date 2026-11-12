@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from apps.customers.models import Customer
 from apps.inventory.models import Product
+from apps.core.models import StoreSettings
 
 
 class Order(models.Model):
@@ -54,6 +55,7 @@ class Order(models.Model):
             "tax": float(self.tax),
             "discount": float(self.discount),
             "total": float(self.total),
+            "currency_symbol": StoreSettings.get_settings().currency_symbol,
             "payment_method": self.payment_method,
             "payment_status": self.payment_status,
             "status": self.status,

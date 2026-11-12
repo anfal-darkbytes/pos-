@@ -5,7 +5,7 @@
  * and Background Sync coordination.
  */
 
-const CACHE_NAME = 'pulse-pos-v3';
+const CACHE_NAME = 'pulse-pos-v4';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_ASSETS = [

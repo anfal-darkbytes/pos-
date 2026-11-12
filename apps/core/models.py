@@ -13,18 +13,6 @@ class StoreSettings(models.Model):
     currency_symbol = models.CharField(max_length=10, default="$")
     receipt_footer = models.TextField(default="Thank you for shopping with us!")
     low_stock_alert_enabled = models.BooleanField(default=True)
-
-    # SMTP Configuration
-    smtp_host = models.CharField(max_length=150, blank=True, null=True)
-    smtp_port = models.CharField(max_length=10, blank=True, null=True)
-    smtp_user = models.CharField(max_length=150, blank=True, null=True)
-    smtp_pass = models.CharField(max_length=150, blank=True, null=True)
-    smtp_from_email = models.CharField(max_length=150, blank=True, null=True)
-
-    # Google Drive Integration
-    gdrive_client_id = models.TextField(blank=True, null=True)
-    gdrive_client_secret = models.TextField(blank=True, null=True)
-
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -54,13 +42,6 @@ class StoreSettings(models.Model):
             "currency_symbol": self.currency_symbol,
             "receipt_footer": self.receipt_footer,
             "low_stock_alert_enabled": self.low_stock_alert_enabled,
-            "smtp_host": self.smtp_host or "",
-            "smtp_port": self.smtp_port or "",
-            "smtp_user": self.smtp_user or "",
-            "smtp_pass": self.smtp_pass or "",
-            "smtp_from_email": self.smtp_from_email or "",
-            "gdrive_client_id": self.gdrive_client_id or "",
-            "gdrive_client_secret": self.gdrive_client_secret or "",
         }
 
 

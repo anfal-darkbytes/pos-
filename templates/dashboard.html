@@ -370,6 +370,7 @@
   async function viewOrder(orderId) {
     const res = await fetch('/orders/' + orderId);
     const order = await res.json();
+    const symbol = order.currency_symbol || window.currencySymbol || "{{ settings.currency_symbol }}";
     const body = document.getElementById('orderModalBody');
     body.innerHTML = `
       <div class="grid grid-cols-2 gap-3 text-sm mb-4">

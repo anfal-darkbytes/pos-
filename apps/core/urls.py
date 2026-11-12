@@ -15,7 +15,5 @@ urlpatterns = [
     path("backup/download", views.backup_download, name="backup_download"),
     path("backup/download/<str:filename>", views.backup_download_snapshot, name="backup_download_snapshot"),
     path("backup/delete/<str:filename>", views.backup_delete, name="backup_delete"),
-    path("backup/auth/google", views.backup_auth_google, name="backup_auth_google"),
-    path("backup/upload/<str:filename>", views.backup_upload, name="backup_upload"),
 ]
 

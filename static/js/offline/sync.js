@@ -229,6 +229,19 @@
         }
         if (data.settings) {
           await Repos.settings.save(data.settings);
+          if (data.settings.currency_symbol) {
+            window.currencySymbol = data.settings.currency_symbol;
+            try {
+              localStorage.setItem('quickpos-currency-symbol', data.settings.currency_symbol);
+            } catch (e) {}
+          }
+          if (data.settings.currency) {
+            window.currencyCode = data.settings.currency;
+            try {
+              localStorage.setItem('quickpos-currency-code', data.settings.currency);
+            } catch (e) {}
+          }
+          window.dispatchEvent(new CustomEvent('pulsepos:settings-updated', { detail: data.settings }));
         }
         if (Array.isArray(data.payment_accounts) && data.payment_accounts.length > 0) {
           if (Repos.paymentAccounts) {

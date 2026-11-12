@@ -7,17 +7,22 @@
 <div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto pos-view-enter space-y-6">
 
   <!-- Top Hero Header Card -->
-  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800 border border-gray-800 p-6 sm:p-8 shadow-xl">
-    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div
+    class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800 border border-gray-800 p-6 sm:p-8 shadow-xl">
+    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none">
+    </div>
     <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-      
+
       <div class="flex items-center gap-4 sm:gap-5">
         <!-- Big User Avatar -->
         <div class="relative shrink-0">
-          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white font-extrabold text-2xl sm:text-3xl grid place-items-center shadow-lg shadow-emerald-950/50 ring-4 ring-emerald-500/20">
+          <div
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white font-extrabold text-2xl sm:text-3xl grid place-items-center shadow-lg shadow-emerald-950/50 ring-4 ring-emerald-500/20">
             {{ (profile_user.name or profile_user.username or 'U')[:2] | upper }}
           </div>
-          <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 ring-4 ring-gray-900 grid place-items-center" title="Account Active">
+          <span
+            class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 ring-4 ring-gray-900 grid place-items-center"
+            title="Account Active">
             <i data-lucide="check" class="w-3 h-3 text-white"></i>
           </span>
         </div>
@@ -25,7 +30,8 @@
         <!-- Name & Badges -->
         <div class="flex flex-col">
           <div class="flex items-center gap-2.5 flex-wrap">
-            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white">{{ profile_user.name or profile_user.username }}</h2>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white">{{ profile_user.name or
+              profile_user.username }}</h2>
             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider
               {% if profile_user.role == 'admin' %}bg-purple-900/60 text-purple-300 border border-purple-700/60
               {% elif profile_user.role == 'manager' %}bg-blue-900/60 text-blue-300 border border-blue-700/60
@@ -41,16 +47,6 @@
         </div>
       </div>
 
-      <!-- Quick Session Badge -->
-      <div class="flex items-center gap-3 bg-gray-800/80 border border-gray-700/60 rounded-xl px-4 py-2.5 text-xs text-gray-300 shrink-0 shadow-inner">
-        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 grid place-items-center">
-          <i data-lucide="shield-check" class="w-4 h-4"></i>
-        </div>
-        <div>
-          <p class="font-semibold text-white">30-Day Session Active</p>
-          <p class="text-[11px] text-emerald-400">Authenticated & Persistent</p>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -62,7 +58,8 @@
     <div class="space-y-6">
 
       <!-- Account Summary Card -->
-      <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm space-y-4">
+      <div
+        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm space-y-4">
         <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
           <i data-lucide="user-check" class="w-4 h-4 text-primary-500"></i>
           <h3 class="font-bold text-sm tracking-tight">Account Overview</h3>
@@ -79,15 +76,16 @@
           </div>
           <div class="flex items-center justify-between py-1 border-t border-gray-100 dark:border-gray-800">
             <span class="text-gray-500 dark:text-gray-400">Phone</span>
-            <span class="text-gray-900 dark:text-gray-100 font-medium">{{ profile_user.phone or 'Not configured' }}</span>
+            <span class="text-gray-900 dark:text-gray-100 font-medium">{{ profile_user.phone or 'Not configured'
+              }}</span>
           </div>
           <div class="flex items-center justify-between py-1 border-t border-gray-100 dark:border-gray-800">
             <span class="text-gray-500 dark:text-gray-400">Member Since</span>
             <span class="text-gray-900 dark:text-gray-100 font-medium">
               {% if profile_user.date_joined %}
-                {{ profile_user.date_joined.strftime('%b %d, %Y') }}
+              {{ profile_user.date_joined.strftime('%b %d, %Y') }}
               {% else %}
-                Recent
+              Recent
               {% endif %}
             </span>
           </div>
@@ -101,17 +99,20 @@
       </div>
 
       <!-- Persistent 30-Day Session Security Card -->
-      <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm space-y-4">
+      <div
+        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm space-y-4">
         <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
           <i data-lucide="lock" class="w-4 h-4 text-emerald-500"></i>
           <h3 class="font-bold text-sm tracking-tight">30-Day Session Security</h3>
         </div>
 
         <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-          Pulse POS enforces a strict 30-day persistent session policy. While your session is active, redundant login attempts are prevented to maintain session integrity.
+          Pulse POS enforces a strict 30-day persistent session policy. While your session is active, redundant login
+          attempts are prevented to maintain session integrity.
         </p>
 
-        <div class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2 text-xs">
+        <div
+          class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2 text-xs">
           <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold">
             <i data-lucide="badge-check" class="w-4 h-4 text-emerald-500"></i>
             <span>Session Protection Active</span>
@@ -121,7 +122,8 @@
           </p>
         </div>
 
-        <a href="/logout" class="w-full h-10 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+        <a href="/logout"
+          class="w-full h-10 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
           <i data-lucide="log-out" class="w-4 h-4"></i>
           <span>End Current Session (Sign Out)</span>
         </a>
@@ -135,12 +137,14 @@
       <!-- Form 1: Edit Profile Information -->
       <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
         <div class="flex items-center gap-3 pb-4 mb-5 border-b border-gray-100 dark:border-gray-800">
-          <div class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-emerald-900/40 text-primary-600 dark:text-emerald-400 grid place-items-center">
+          <div
+            class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-emerald-900/40 text-primary-600 dark:text-emerald-400 grid place-items-center">
             <i data-lucide="edit-3" class="w-5 h-5"></i>
           </div>
           <div>
             <h3 class="font-bold text-base text-gray-900 dark:text-gray-100">Personal Information</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Update your account name, contact email, and phone number</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Update your account name, contact email, and phone
+              number</p>
           </div>
         </div>
 
@@ -155,7 +159,8 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Username (Read-Only)</label>
+              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Username
+                (Read-Only)</label>
               <input type="text" value="{{ profile_user.username }}" disabled
                 class="w-full h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-500 text-sm px-3.5 cursor-not-allowed">
             </div>
@@ -174,7 +179,8 @@
           </div>
 
           <div class="pt-3 flex justify-end">
-            <button type="submit" class="h-10 px-5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+            <button type="submit"
+              class="h-10 px-5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
               <i data-lucide="check" class="w-4 h-4"></i>
               <span>Save Changes</span>
             </button>
@@ -185,12 +191,14 @@
       <!-- Form 2: Change Password -->
       <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
         <div class="flex items-center gap-3 pb-4 mb-5 border-b border-gray-100 dark:border-gray-800">
-          <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 grid place-items-center">
+          <div
+            class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 grid place-items-center">
             <i data-lucide="key" class="w-5 h-5"></i>
           </div>
           <div>
             <h3 class="font-bold text-base text-gray-900 dark:text-gray-100">Security & Password</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Ensure your POS terminal account is safeguarded with a secure password</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Ensure your POS terminal account is safeguarded with a
+              secure password</p>
           </div>
         </div>
 
@@ -211,7 +219,8 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Confirm New Password</label>
+              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Confirm New
+                Password</label>
               <input type="password" name="confirm_password" required minlength="6" placeholder="Repeat new password"
                 class="w-full h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm px-3.5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all">
             </div>
@@ -222,7 +231,8 @@
               <i data-lucide="info" class="w-3.5 h-3.5 text-gray-400"></i>
               <span>Must be at least 6 characters</span>
             </span>
-            <button type="submit" class="h-10 px-5 rounded-xl bg-gray-900 dark:bg-gray-800 hover:bg-black dark:hover:bg-gray-700 text-white text-xs font-bold border border-gray-700/60 shadow-sm transition-all flex items-center gap-2">
+            <button type="submit"
+              class="h-10 px-5 rounded-xl bg-gray-900 dark:bg-gray-800 hover:bg-black dark:hover:bg-gray-700 text-white text-xs font-bold border border-gray-700/60 shadow-sm transition-all flex items-center gap-2">
               <i data-lucide="shield" class="w-4 h-4"></i>
               <span>Update Password</span>
             </button>
@@ -236,4 +246,3 @@
 
 </div>
 {% endblock %}
-

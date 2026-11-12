@@ -154,7 +154,8 @@
     if (!content) return;
     const win = window.open('', '_blank');
     win.document.write('<html><head><title>Invoice ' + (currentInvoiceOrder?.order_number || '') + '</title>');
-    win.document.write('<style>body{font-family:monospace;font-size:12px;padding:20px;color:#000;background:#fff} @media print{@page{margin:0.5in}} .no-print{display:none!important}</style>');
+    win.document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
+    win.document.write('<style>body{font-family:"JetBrains Mono","Plus Jakarta Sans",monospace,sans-serif;-webkit-font-smoothing:antialiased;font-size:12px;padding:24px;color:#111;background:#fff} @media print{@page{margin:0.4in}} .no-print{display:none!important}</style>');
     win.document.write('</head><body>');
     win.document.write(content.outerHTML);
     win.document.write('</body></html>');

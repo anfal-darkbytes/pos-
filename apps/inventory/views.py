@@ -1,4 +1,8 @@
+import os
+import uuid
+from django.conf import settings as django_settings
 from django.contrib import messages
+from django.core.files.storage import default_storage
 from django.db.models import Count, F, Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -6,6 +10,18 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.core.utils import csv_response, login_required_pos, parse_float, parse_int, render_pos
 from apps.inventory.models import Category, Product
+
+
+def _handle_product_image_upload(uploaded_file):
+    if not uploaded_file:
+        return None
+    ext = os.path.splitext(uploaded_file.name)[1].lower()
+    if ext not in [".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif"]:
+        ext = ".jpg"
+    filename = f"prod_{uuid.uuid4().hex[:12]}{ext}"
+    rel_path = os.path.join("products", filename)
+    saved_path = default_storage.save(rel_path, uploaded_file)
+    return f"{django_settings.MEDIA_URL.rstrip('/')}/{saved_path.replace(os.sep, '/')}"
 
 
 @login_required_pos
@@ -74,7 +90,13 @@ def products_new(request):
         messages.error(request, f"Product SKU '{sku}' already exists")
         return redirect("/products")
 
-    Product.objects.create(
+    image_url = None
+    if request.FILES.get("image"):
+        image_url = _handle_product_image_upload(request.FILES.get("image"))
+    elif request.POST.get("image_url", "").strip():
+        image_url = request.POST.get("image_url").strip()
+
+    product = Product.objects.create(
         name=name,
         sku=sku,
         barcode=barcode,
@@ -85,9 +107,10 @@ def products_new(request):
         stock=stock,
         low_stock_threshold=low_stock_threshold,
         unit=unit,
+        image_url=image_url,
         is_active=is_active,
     )
-    messages.success(request, "Product created successfully")
+    messages.success(request, f"Product '{name}' created successfully")
     return redirect("/products")
 
 
@@ -115,9 +138,17 @@ def products_edit(request, product_id):
     product.low_stock_threshold = parse_int(request.POST.get("low_stock_threshold"), product.low_stock_threshold)
     product.unit = request.POST.get("unit", product.unit)
     product.is_active = request.POST.get("is_active") in ("on", "true", "1")
+
+    if request.FILES.get("image"):
+        product.image_url = _handle_product_image_upload(request.FILES.get("image"))
+    elif request.POST.get("remove_image") in ("1", "true", "on"):
+        product.image_url = None
+    elif request.POST.get("image_url") is not None and request.POST.get("image_url").strip():
+        product.image_url = request.POST.get("image_url").strip()
+
     product.save()
 
-    messages.success(request, "Product updated")
+    messages.success(request, f"Product '{product.name}' updated")
     return redirect("/products")
 
 
@@ -251,8 +282,22 @@ def inventory_adjust(request, product_id):
     product.stock = new_stock
     product.save()
 
-    messages.success(request, f"Stock adjusted: {old_stock} → {new_stock}")
-    return redirect("/inventory")
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.GET.get("format") == "json":
+        return JsonResponse({
+            "success": True,
+            "product_id": str(product.id),
+            "name": product.name,
+            "old_stock": old_stock,
+            "new_stock": new_stock,
+            "unit": product.unit,
+            "is_low": product.is_low,
+            "stock_value": float(product.stock_value),
+            "message": f"Stock adjusted: {old_stock} → {new_stock} {product.unit}",
+        })
+
+    next_url = request.POST.get("next") or request.GET.get("next") or "/products"
+    messages.success(request, f"Stock adjusted for '{product.name}': {old_stock} → {new_stock} {product.unit}")
+    return redirect(next_url)
 
 
 @login_required_pos
