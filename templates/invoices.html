@@ -46,7 +46,13 @@
             <td class="px-4 py-3 text-sm text-gray-500">{{ o.cashier_name }}</td>
             <td class="px-4 py-3"><span class="tabular-nums text-xs">{{ o.items_count }} items</span></td>
             <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ o.total | money }}</td>
-            <td class="px-4 py-3 text-center"><span class="inline-flex items-center gap-1 text-xs capitalize px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700">{{ o.payment_method }}</span></td>
+            <td class="px-4 py-3 text-center">
+              {% if o.payment_method == 'split' %}
+              <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800"><i data-lucide="pie-chart" class="w-3 h-3"></i> Split</span>
+              {% else %}
+              <span class="inline-flex items-center gap-1 text-xs capitalize px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700">{{ o.payment_method }}</span>
+              {% endif %}
+            </td>
             <td class="px-4 py-3 text-right">
               <button onclick="printInvoice('{{ o.id }}')" class="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-primary-500 text-white text-xs font-medium hover:bg-primary-600 transition-colors"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Print</button>
             </td>
@@ -73,71 +79,97 @@
 </div>
 
 <script>
-const sym = "{{ settings.currency_symbol }}";
-const store = "{{ settings.store_name | e }}";
-const address = "{{ settings.address | e }}";
-const phone = "{{ settings.phone | e }}";
-const footer = "{{ settings.receipt_footer | e }}";
+(function () {
+  var sym = window.currencySymbol || "{{ settings.currency_symbol }}";
+  var store = "{{ settings.store_name | e }}";
+  var address = "{{ settings.address | e }}";
+  var phone = "{{ settings.phone | e }}";
+  var footer = "{{ settings.receipt_footer | e }}";
 
-let currentInvoiceOrder = null;
+  var currentInvoiceOrder = null;
 
-async function printInvoice(orderId) {
-  const res = await fetch('/orders/' + orderId);
-  currentInvoiceOrder = await res.json();
-  const o = currentInvoiceOrder;
-  const body = document.getElementById('invoiceBody');
+  async function printInvoice(orderId) {
+    const res = await fetch('/orders/' + orderId);
+    currentInvoiceOrder = await res.json();
+    const o = currentInvoiceOrder;
+    const body = document.getElementById('invoiceBody');
 
-  const itemsHtml = o.items.map(i => `
-    <div class="flex justify-between text-xs py-1"><span>${i.quantity}× ${i.name}</span><span>${sym}${i.subtotal.toFixed(2)}</span></div>
-  `).join('');
+    const itemsHtml = o.items.map(i => `
+      <div class="flex justify-between text-xs py-1"><span>${i.quantity}× ${i.name}</span><span>${sym}${i.subtotal.toFixed(2)}</span></div>
+    `).join('');
 
-  body.innerHTML = `
-    <div id="invoicePrintable" class="bg-white text-black rounded-lg p-4 font-mono text-xs space-y-1 border border-dashed border-gray-300">
-      <div class="text-center pb-2 border-b border-dashed border-gray-300">
-        <p class="font-bold text-sm">${store}</p>
-        <p class="text-[10px]">${address}</p>
-        <p class="text-[10px]">${phone}</p>
+    body.innerHTML = `
+      <div id="invoicePrintable" class="bg-white text-black rounded-lg p-4 font-mono text-xs space-y-1 border border-dashed border-gray-300">
+        <div class="text-center pb-2 border-b border-dashed border-gray-300">
+          <p class="font-bold text-sm">${store}</p>
+          <p class="text-[10px]">${address}</p>
+          <p class="text-[10px]">${phone}</p>
+        </div>
+        <div class="py-2 border-b border-dashed border-gray-300 text-[10px]">
+          <div class="flex justify-between"><span>Invoice:</span><span>${o.order_number}</span></div>
+          <div class="flex justify-between"><span>Date:</span><span>${new Date(o.created_at).toLocaleString()}</span></div>
+          <div class="flex justify-between"><span>Cashier:</span><span>${o.cashier_name}</span></div>
+          <div class="flex justify-between"><span>Customer:</span><span>${o.customer_name}</span></div>
+        </div>
+        <div class="py-2 border-b border-dashed border-gray-300 space-y-1">
+          ${itemsHtml}
+        </div>
+        <div class="py-2 space-y-1 text-[10px]">
+          <div class="flex justify-between"><span>Subtotal</span><span>${sym}${o.subtotal.toFixed(2)}</span></div>
+          <div class="flex justify-between"><span>Tax (${o.tax_rate}%)</span><span>${sym}${o.tax.toFixed(2)}</span></div>
+          ${o.discount > 0 ? `<div class="flex justify-between"><span>Discount</span><span>-${sym}${o.discount.toFixed(2)}</span></div>` : ''}
+          <div class="flex justify-between font-bold text-xs pt-1 border-t border-gray-300"><span>TOTAL</span><span>${sym}${o.total.toFixed(2)}</span></div>
+          <div class="flex justify-between"><span>Payment Method</span><span class="uppercase font-semibold">${o.payment_method}</span></div>
+        </div>
+        ${o.payments && o.payments.length > 0 ? `
+          <div class="py-2 border-b border-dashed border-gray-300 space-y-1 text-[10px]">
+            <p class="font-bold text-[9px] uppercase tracking-wider text-gray-500 mb-1">Payment Tender Breakdown:</p>
+            ${o.payments.map(p => `
+              <div class="flex justify-between">
+                <span>
+                  ${p.payment_method === 'cash' ? '💵 Cash' : (p.payment_method === 'bank' ? '🏦 ' + (p.account_name || 'Bank') : '📱 ' + (p.account_name || 'Wallet'))}
+                  ${p.reference ? `<span class="text-gray-500 font-mono text-[9px]">(#${p.reference})</span>` : ''}
+                </span>
+                <span class="font-bold tabular-nums">${sym}${parseFloat(p.amount || 0).toFixed(2)}</span>
+              </div>
+              ${p.payment_method === 'cash' && p.change > 0 ? `
+                <div class="flex justify-between text-[9px] text-gray-500 pl-3">
+                  <span>(Tendered: ${sym}${parseFloat(p.tendered || 0).toFixed(2)} · Change: ${sym}${parseFloat(p.change || 0).toFixed(2)})</span>
+                </div>
+              ` : ''}
+            `).join('')}
+          </div>
+        ` : ''}
+        <div class="text-center pt-2 text-[10px]">${footer}</div>
       </div>
-      <div class="py-2 border-b border-dashed border-gray-300 text-[10px]">
-        <div class="flex justify-between"><span>Invoice:</span><span>${o.order_number}</span></div>
-        <div class="flex justify-between"><span>Date:</span><span>${new Date(o.created_at).toLocaleString()}</span></div>
-        <div class="flex justify-between"><span>Cashier:</span><span>${o.cashier_name}</span></div>
-        <div class="flex justify-between"><span>Customer:</span><span>${o.customer_name}</span></div>
-      </div>
-      <div class="py-2 border-b border-dashed border-gray-300 space-y-1">
-        ${itemsHtml}
-      </div>
-      <div class="py-2 space-y-1 text-[10px]">
-        <div class="flex justify-between"><span>Subtotal</span><span>${sym}${o.subtotal.toFixed(2)}</span></div>
-        <div class="flex justify-between"><span>Tax (${o.tax_rate}%)</span><span>${sym}${o.tax.toFixed(2)}</span></div>
-        ${o.discount > 0 ? `<div class="flex justify-between"><span>Discount</span><span>-${sym}${o.discount.toFixed(2)}</span></div>` : ''}
-        <div class="flex justify-between font-bold text-xs pt-1 border-t border-gray-300"><span>TOTAL</span><span>${sym}${o.total.toFixed(2)}</span></div>
-      </div>
-      <div class="text-center pt-2 text-[10px]">${footer}</div>
-    </div>
-  `;
+    `;
 
-  document.getElementById('invoiceModal').classList.remove('hidden');
-  document.getElementById('invoiceModal').classList.add('flex');
-  if (window.lucide) lucide.createIcons();
-}
+    document.getElementById('invoiceModal').classList.remove('hidden');
+    document.getElementById('invoiceModal').classList.add('flex');
+    if (window.lucide) lucide.createIcons();
+  }
 
-function printInvoiceContent() {
-  const content = document.getElementById('invoicePrintable');
-  if (!content) return;
-  const win = window.open('', '_blank');
-  win.document.write('<html><head><title>Invoice ' + (currentInvoiceOrder?.order_number || '') + '</title>');
-  win.document.write('<style>body{font-family:monospace;font-size:12px;padding:20px;color:#000;background:#fff} @media print{@page{margin:0.5in}} .no-print{display:none!important}</style>');
-  win.document.write('</head><body>');
-  win.document.write(content.outerHTML);
-  win.document.write('</body></html>');
-  win.document.close();
-  setTimeout(() => { win.print(); }, 200);
-}
+  function printInvoiceContent() {
+    const content = document.getElementById('invoicePrintable');
+    if (!content) return;
+    const win = window.open('', '_blank');
+    win.document.write('<html><head><title>Invoice ' + (currentInvoiceOrder?.order_number || '') + '</title>');
+    win.document.write('<style>body{font-family:monospace;font-size:12px;padding:20px;color:#000;background:#fff} @media print{@page{margin:0.5in}} .no-print{display:none!important}</style>');
+    win.document.write('</head><body>');
+    win.document.write(content.outerHTML);
+    win.document.write('</body></html>');
+    win.document.close();
+    setTimeout(() => { win.print(); }, 200);
+  }
 
-function closeInvoiceModal() {
-  document.getElementById('invoiceModal').classList.add('hidden');
-  document.getElementById('invoiceModal').classList.remove('flex');
-}
+  function closeInvoiceModal() {
+    document.getElementById('invoiceModal').classList.add('hidden');
+    document.getElementById('invoiceModal').classList.remove('flex');
+  }
+
+  window.printInvoice = printInvoice;
+  window.printInvoiceContent = printInvoiceContent;
+  window.closeInvoiceModal = closeInvoiceModal;
+})();
 </script>
 {% endblock %}

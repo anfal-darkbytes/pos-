@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.accounts.models import PasswordResetOTP, User
 from apps.core.models import StoreSettings
-from apps.core.utils import admin_required_pos, render_pos
+from apps.core.utils import admin_required_pos, login_required_pos, render_pos
 
 
 def send_otp_email(to_email, otp):
@@ -214,6 +214,86 @@ def reset_password_view(request):
             return redirect("/login")
 
     return render_pos(request, "reset_password.html")
+
+
+@csrf_exempt
+@login_required_pos
+def profile_view(request):
+    user = request.user if getattr(request.user, "is_authenticated", False) else None
+    if not user:
+        uid = request.session.get("user_id")
+        user = User.objects.filter(id=uid).first() if uid else None
+
+    if not user:
+        messages.error(request, "Session not found. Please log in.")
+        return redirect("/login")
+
+    if request.method == "POST":
+        action = request.POST.get("action", "update_profile")
+
+        if action == "update_profile":
+            name = request.POST.get("name", "").strip()
+            email = request.POST.get("email", "").strip().lower()
+            phone = request.POST.get("phone", "").strip()
+
+            if not name or not email:
+                messages.error(request, "Name and Email are required.")
+                return redirect("/profile")
+
+            if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+                messages.error(request, "This email address is already in use by another account.")
+                return redirect("/profile")
+
+            user.name = name
+            user.email = email
+            user.phone = phone
+            user.save()
+
+            request.session["user_name"] = user.name or user.username
+            request.session.modified = True
+            messages.success(request, "Profile updated successfully.")
+            return redirect("/profile")
+
+        elif action == "change_password":
+            current_password = request.POST.get("current_password", "")
+            new_password = request.POST.get("new_password", "")
+            confirm_password = request.POST.get("confirm_password", "")
+
+            if not current_password or not new_password or not confirm_password:
+                messages.error(request, "All password fields are required.")
+                return redirect("/profile")
+
+            if not (user.check_password(current_password) or check_password(current_password, user.password)):
+                messages.error(request, "Current password is incorrect.")
+                return redirect("/profile")
+
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return redirect("/profile")
+
+            if len(new_password) < 6:
+                messages.error(request, "New password must be at least 6 characters.")
+                return redirect("/profile")
+
+            user.set_password(new_password)
+            user.save()
+            login(request, user)
+            messages.success(request, "Password updated successfully.")
+            return redirect("/profile")
+
+    login_time = request.session.get("login_time")
+    settings = StoreSettings.get_settings()
+
+    return render_pos(
+        request,
+        "profile.html",
+        {
+            "active_view": "profile",
+            "profile_user": user,
+            "login_time": login_time,
+            "settings": settings,
+        },
+    )
 
 
 @admin_required_pos

@@ -102,29 +102,42 @@
 </div>
 
 <script>
-function openCustomerModal(customer) {
-  const form = document.getElementById('custForm');
-  if (customer) {
-    document.getElementById('custModalTitle').textContent = 'Edit Customer';
-    form.action = '/customers/' + customer.id + '/edit';
-    document.getElementById('c_name').value = customer.name;
-    document.getElementById('c_phone').value = customer.phone || '';
-    document.getElementById('c_email').value = customer.email || '';
-    document.getElementById('c_address').value = customer.address || '';
-    document.getElementById('c_points').value = customer.loyalty_points;
-    document.getElementById('c_note').value = customer.note || '';
-  } else {
-    document.getElementById('custModalTitle').textContent = 'Add New Customer';
-    form.action = '/customers/new';
-    form.reset();
-    document.getElementById('c_points').value = 0;
+(function () {
+  function openCustomerModal(customer) {
+    const form = document.getElementById('custForm');
+    if (!form) return;
+    if (customer) {
+      document.getElementById('custModalTitle').textContent = 'Edit Customer';
+      form.action = '/customers/' + customer.id + '/edit';
+      document.getElementById('c_name').value = customer.name;
+      document.getElementById('c_phone').value = customer.phone || '';
+      document.getElementById('c_email').value = customer.email || '';
+      document.getElementById('c_address').value = customer.address || '';
+      document.getElementById('c_points').value = customer.loyalty_points;
+      document.getElementById('c_note').value = customer.note || '';
+    } else {
+      document.getElementById('custModalTitle').textContent = 'Add New Customer';
+      form.action = '/customers/new';
+      form.reset();
+      document.getElementById('c_points').value = 0;
+    }
+    const modal = document.getElementById('customerModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
   }
-  document.getElementById('customerModal').classList.remove('hidden');
-  document.getElementById('customerModal').classList.add('flex');
-}
-function closeCustomerModal() {
-  document.getElementById('customerModal').classList.add('hidden');
-  document.getElementById('customerModal').classList.remove('flex');
-}
+
+  function closeCustomerModal() {
+    const modal = document.getElementById('customerModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  window.openCustomerModal = openCustomerModal;
+  window.closeCustomerModal = closeCustomerModal;
+})();
 </script>
 {% endblock %}

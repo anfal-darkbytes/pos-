@@ -83,32 +83,44 @@
 </div>
 
 <script>
-function openUserModal(user) {
-  const form = document.getElementById('userForm');
-  const hint = document.getElementById('u_pass_hint');
-  if (user) {
-    document.getElementById('userModalTitle').textContent = 'Edit User';
-    form.action = '/users/' + user.id + '/edit';
-    document.getElementById('u_name').value = user.name;
-    document.getElementById('u_email').value = user.email;
-    document.getElementById('u_password').value = '';
-    document.getElementById('u_password').required = false;
-    document.getElementById('u_role').value = user.role;
-    hint.textContent = 'Leave blank to keep current password.';
-  } else {
-    document.getElementById('userModalTitle').textContent = 'Add New User';
-    form.action = '/users/new';
-    form.reset();
-    document.getElementById('u_password').required = true;
-    hint.textContent = 'Required for new users. Leave blank to keep current password when editing.';
+(function () {
+  function openUserModal(user) {
+    const form = document.getElementById('userForm');
+    const hint = document.getElementById('u_pass_hint');
+    if (user) {
+      document.getElementById('userModalTitle').textContent = 'Edit User';
+      form.action = '/users/' + user.id + '/edit';
+      document.getElementById('u_name').value = user.name;
+      document.getElementById('u_email').value = user.email;
+      document.getElementById('u_password').value = '';
+      document.getElementById('u_password').required = false;
+      document.getElementById('u_role').value = user.role;
+      if (hint) hint.textContent = 'Leave blank to keep current password.';
+    } else {
+      document.getElementById('userModalTitle').textContent = 'Add New User';
+      form.action = '/users/new';
+      form.reset();
+      document.getElementById('u_password').required = true;
+      if (hint) hint.textContent = 'Required for new users. Leave blank to keep current password when editing.';
+    }
+    const modal = document.getElementById('userModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    if (window.lucide) lucide.createIcons();
   }
-  document.getElementById('userModal').classList.remove('hidden');
-  document.getElementById('userModal').classList.add('flex');
-  if (window.lucide) lucide.createIcons();
-}
-function closeUserModal() {
-  document.getElementById('userModal').classList.add('hidden');
-  document.getElementById('userModal').classList.remove('flex');
-}
+
+  function closeUserModal() {
+    const modal = document.getElementById('userModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  window.openUserModal = openUserModal;
+  window.closeUserModal = closeUserModal;
+})();
 </script>
 {% endblock %}

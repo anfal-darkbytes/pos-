@@ -119,52 +119,66 @@
 </div>
 
 <script>
-const symbol = "{{ settings.currency_symbol }}";
-const daily = {{ daily_sales | tojson }};
-const cats = {{ category_breakdown | tojson }};
-const tops = {{ top_products | tojson }};
+(function () {
+  var symbol = window.currencySymbol || "{{ settings.currency_symbol }}";
+  var daily = {{ daily_sales | tojson }};
+  var cats = {{ category_breakdown | tojson }};
+  var tops = {{ top_products | tojson }};
 
-// Revenue vs Profit
-new Chart(document.getElementById('revProfitChart'), {
-  type: 'line',
-  data: {
-    labels: daily.map(d => d.label),
-    datasets: [
-      { label: 'Revenue', data: daily.map(d => d.sales), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.4, borderWidth: 2 },
-      { label: 'Profit', data: daily.map(d => d.profit), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
-    ],
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    scales: { y: { ticks: { callback: v => symbol + v } } },
-  },
-});
+  // Revenue vs Profit
+  var revCtx = document.getElementById('revProfitChart');
+  if (revCtx) {
+    new Chart(revCtx, {
+      type: 'line',
+      data: {
+        labels: daily.map(d => d.label),
+        datasets: [
+          { label: 'Revenue', data: daily.map(d => d.sales), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.4, borderWidth: 2 },
+          { label: 'Profit', data: daily.map(d => d.profit), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { ticks: { callback: v => symbol + v } } },
+      },
+    });
+  }
 
-// Orders line
-new Chart(document.getElementById('ordersChart'), {
-  type: 'line',
-  data: { labels: daily.map(d => d.label), datasets: [{ label: 'Orders', data: daily.map(d => d.orders), borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.4, borderWidth: 2, pointRadius: 3 }] },
-  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
-});
+  // Orders line
+  var ordCtx = document.getElementById('ordersChart');
+  if (ordCtx) {
+    new Chart(ordCtx, {
+      type: 'line',
+      data: { labels: daily.map(d => d.label), datasets: [{ label: 'Orders', data: daily.map(d => d.orders), borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.4, borderWidth: 2, pointRadius: 3 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+    });
+  }
 
-// Category pie
-new Chart(document.getElementById('catChart'), {
-  type: 'doughnut',
-  data: { labels: cats.map(c => c.name), datasets: [{ data: cats.map(c => c.revenue), backgroundColor: cats.map(c => c.color) }] },
-  options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } },
-});
+  // Category pie
+  var catCtx = document.getElementById('catChart');
+  if (catCtx) {
+    new Chart(catCtx, {
+      type: 'doughnut',
+      data: { labels: cats.map(c => c.name), datasets: [{ data: cats.map(c => c.revenue), backgroundColor: cats.map(c => c.color) }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } },
+    });
+  }
 
-// Category bar
-new Chart(document.getElementById('catBarChart'), {
-  type: 'bar',
-  data: {
-    labels: cats.map(c => c.name),
-    datasets: [
-      { label: 'Revenue', data: cats.map(c => c.revenue), backgroundColor: '#10b981', borderRadius: 4 },
-      { label: 'Profit', data: cats.map(c => c.profit), backgroundColor: '#059669', borderRadius: 4 },
-    ],
-  },
-  options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => symbol + v } } } },
-});
+  // Category bar
+  var barCtx = document.getElementById('catBarChart');
+  if (barCtx) {
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: cats.map(c => c.name),
+        datasets: [
+          { label: 'Revenue', data: cats.map(c => c.revenue), backgroundColor: '#10b981', borderRadius: 4 },
+          { label: 'Profit', data: cats.map(c => c.profit), backgroundColor: '#059669', borderRadius: 4 },
+        ],
+      },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => symbol + v } } } },
+    });
+  }
+})();
 </script>
 {% endblock %}

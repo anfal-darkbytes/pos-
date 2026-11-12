@@ -69,8 +69,15 @@
           <tr data-product-name="{{ p.name | lower }}" data-product-sku="{{ p.sku | lower }}" data-product-cat="{{ p.category_id }}" data-stock-status="{% if is_out %}out{% elif is_low %}low{% elif is_over %}overstock{% else %}healthy{% endif %}">
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg grid place-items-center text-xs font-bold shrink-0" style="background: {{ p.category_color }}22; color: {{ p.category_color }}">{{ p.name[:2] | upper }}</div>
-                <div class="min-w-0"><p class="font-medium text-sm truncate">{{ p.name }}</p><p class="text-[11px] text-gray-500 font-mono">{{ p.sku }}</p></div>
+                <div class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200/50 dark:border-gray-800 shadow-sm p-0.5" style="background: {{ p.category_color }}15; color: {{ p.category_color }}">
+                  {% if p.image_url %}
+                  <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                  <span class="hidden">{{ p.name[:2] | upper }}</span>
+                  {% else %}
+                  <span>{{ p.name[:2] | upper }}</span>
+                  {% endif %}
+                </div>
+                <div class="min-w-0"><p class="font-semibold text-sm truncate text-gray-900 dark:text-gray-100">{{ p.name }}</p><p class="text-[11px] text-gray-500 font-mono">{{ p.sku }}</p></div>
               </div>
             </td>
             <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] border" style="color: {{ p.category_color }}; border-color: {{ p.category_color }}55">{{ p.category_name }}</span></td>
@@ -133,90 +140,101 @@
 </div>
 
 <script>
-const symbol = "{{ settings.currency_symbol }}";
-const catDist = {{ category_dist | tojson }};
+(function () {
+  var symbol = window.currencySymbol || "{{ settings.currency_symbol }}";
+  var catDist = {{ category_dist | tojson }};
 
-new Chart(document.getElementById('invChart'), {
-  type: 'bar',
-  data: {
-    labels: catDist.map(c => c.name),
-    datasets: [{
-      label: 'Inventory Value',
-      data: catDist.map(c => c.value),
-      backgroundColor: catDist.map(c => c.color),
-      borderRadius: 4,
-    }],
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: { y: { ticks: { callback: v => symbol + v } } },
-  },
-});
+  var chartEl = document.getElementById('invChart');
+  if (chartEl) {
+    new Chart(chartEl, {
+      type: 'bar',
+      data: {
+        labels: catDist.map(c => c.name),
+        datasets: [{
+          label: 'Inventory Value',
+          data: catDist.map(c => c.value),
+          backgroundColor: catDist.map(c => c.color),
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { ticks: { callback: v => symbol + v } } },
+      },
+    });
+  }
 
-function filterInventory() {
-  const q = (document.getElementById('invSearch').value || '').toLowerCase();
-  const cat = document.getElementById('invCatFilter').value;
-  const stockBtn = document.querySelector('button[id^="stock-"].bg-primary-500');
-  const stockFilter = stockBtn ? stockBtn.id.replace('stock-', '') : 'all';
-  document.querySelectorAll('#invBody tr').forEach(row => {
-    const name = row.dataset.productName || '';
-    const sku = row.dataset.productSku || '';
-    const matchesSearch = !q || name.includes(q) || sku.includes(q);
-    const matchesCat = cat === 'all' || row.dataset.productCat === cat;
-    const status = row.dataset.stockStatus;
-    let matchesStock = stockFilter === 'all' || stockFilter === status;
-    if (stockFilter === 'low') matchesStock = status === 'low' || status === 'out';
-    row.style.display = (matchesSearch && matchesCat && matchesStock) ? '' : 'none';
-  });
-}
+  function filterInventory() {
+    const q = (document.getElementById('invSearch')?.value || '').toLowerCase();
+    const cat = document.getElementById('invCatFilter')?.value || 'all';
+    const stockBtn = document.querySelector('button[id^="stock-"].bg-primary-500');
+    const stockFilter = stockBtn ? stockBtn.id.replace('stock-', '') : 'all';
+    document.querySelectorAll('#invBody tr').forEach(row => {
+      const name = row.dataset.productName || '';
+      const sku = row.dataset.productSku || '';
+      const matchesSearch = !q || name.includes(q) || sku.includes(q);
+      const matchesCat = cat === 'all' || row.dataset.productCat === cat;
+      const status = row.dataset.stockStatus;
+      let matchesStock = stockFilter === 'all' || stockFilter === status;
+      if (stockFilter === 'low') matchesStock = status === 'low' || status === 'out';
+      row.style.display = (matchesSearch && matchesCat && matchesStock) ? '' : 'none';
+    });
+  }
 
-function setStockFilter(filter) {
-  document.querySelectorAll('button[id^="stock-"]').forEach(btn => {
-    if (btn.id === 'stock-' + filter) {
-      btn.classList.add('bg-primary-500', 'text-white');
-      btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-700');
-    } else {
-      btn.classList.remove('bg-primary-500', 'text-white');
-      btn.classList.add('border', 'border-gray-200', 'dark:border-gray-700');
-    }
-  });
-  filterInventory();
-}
-
-function openAdjust(product) {
-  document.getElementById('adjProductId').value = '';
-  document.getElementById('adjustForm').action = '/inventory/' + product.id + '/adjust';
-  document.getElementById('adjCurrent').textContent = product.stock + ' ' + product.unit;
-  document.getElementById('adjThreshold').textContent = product.low_stock_threshold + ' ' + product.unit;
-  document.getElementById('adjustModal').classList.remove('hidden');
-  document.getElementById('adjustModal').classList.add('flex');
-  if (window.lucide) lucide.createIcons();
-}
-
-function closeAdjust() {
-  document.getElementById('adjustModal').classList.add('hidden');
-  document.getElementById('adjustModal').classList.remove('flex');
-}
-
-document.querySelectorAll('.adj-radio').forEach(radio => {
-  radio.addEventListener('change', () => {
-    document.querySelectorAll('.adj-radio').forEach(r => {
-      const btn = r.parentElement.querySelector('.adj-btn');
-      const t = r.dataset.type;
-      if (r.checked) {
-        btn.classList.remove('border-gray-200', 'dark:border-gray-700');
-        btn.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-emerald-900/20');
+  function setStockFilter(filter) {
+    document.querySelectorAll('button[id^="stock-"]').forEach(btn => {
+      if (btn.id === 'stock-' + filter) {
+        btn.classList.add('bg-primary-500', 'text-white');
+        btn.classList.remove('border', 'border-gray-200', 'dark:border-gray-700');
       } else {
-        btn.classList.add('border-gray-200', 'dark:border-gray-700');
-        btn.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-emerald-900/20');
+        btn.classList.remove('bg-primary-500', 'text-white');
+        btn.classList.add('border', 'border-gray-200', 'dark:border-gray-700');
       }
     });
-    const t = radio.value;
-    document.getElementById('adjLabel').textContent = t === 'add' ? 'Quantity to Add' : t === 'remove' ? 'Quantity to Remove' : 'New Stock Level';
+    filterInventory();
+  }
+
+  function openAdjust(product) {
+    document.getElementById('adjProductId').value = '';
+    document.getElementById('adjustForm').action = '/inventory/' + product.id + '/adjust';
+    document.getElementById('adjCurrent').textContent = product.stock + ' ' + product.unit;
+    document.getElementById('adjThreshold').textContent = product.low_stock_threshold + ' ' + product.unit;
+    document.getElementById('adjustModal').classList.remove('hidden');
+    document.getElementById('adjustModal').classList.add('flex');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function closeAdjust() {
+    document.getElementById('adjustModal').classList.add('hidden');
+    document.getElementById('adjustModal').classList.remove('flex');
+  }
+
+  document.querySelectorAll('.adj-radio').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.adj-radio').forEach(r => {
+        const btn = r.parentElement.querySelector('.adj-btn');
+        if (r.checked) {
+          btn.classList.remove('border-gray-200', 'dark:border-gray-700');
+          btn.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-emerald-900/20');
+        } else {
+          btn.classList.add('border-gray-200', 'dark:border-gray-700');
+          btn.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-emerald-900/20');
+        }
+      });
+      const t = radio.value;
+      const label = document.getElementById('adjLabel');
+      if (label) label.textContent = t === 'add' ? 'Quantity to Add' : t === 'remove' ? 'Quantity to Remove' : 'New Stock Level';
+    });
   });
-});
-// Trigger initial styling
-document.querySelector('.adj-radio:checked').dispatchEvent(new Event('change'));
+
+  const checkedRadio = document.querySelector('.adj-radio:checked');
+  if (checkedRadio) checkedRadio.dispatchEvent(new Event('change'));
+
+  window.filterInventory = filterInventory;
+  window.setStockFilter = setStockFilter;
+  window.openAdjust = openAdjust;
+  window.closeAdjust = closeAdjust;
+})();
 </script>
 {% endblock %}

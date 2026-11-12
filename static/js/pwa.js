@@ -181,8 +181,12 @@
     }
   };
 
-  // 5. Network connectivity monitor
+  // 5. Network connectivity monitor (coordinated with PulseSync)
   function updateNetworkStatus() {
+    if (window.PulseSync && typeof window.PulseSync.updateStatusUI === 'function') {
+      window.PulseSync.updateStatusUI();
+      return;
+    }
     const badge = document.getElementById('networkBadge');
     if (!badge) return;
 
@@ -212,5 +216,22 @@
       updateInstallButtons(false, true);
     }
   });
+
+  // Guard logout action if unsynced offline transactions exist
+  window.handleLogoutClick = function (e) {
+    if (window.PulseSync && window.PulseSync.state && window.PulseSync.state.pendingCount > 0) {
+      const count = window.PulseSync.state.pendingCount;
+      const confirmed = window.confirm(
+        `⚠️ WARNING: You have ${count} offline sale(s) stored locally that have not synced yet.\n\n` +
+        `If you log out now, they will remain safely stored on this device until someone signs back in.\n\n` +
+        `Are you sure you want to sign out?`
+      );
+      if (!confirmed) {
+        if (e) e.preventDefault();
+        return false;
+      }
+    }
+    return true;
+  };
 })();
 

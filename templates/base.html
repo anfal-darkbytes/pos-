@@ -109,7 +109,7 @@
               <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Dashboard</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Dashboard</span>
               <span class="nav-desc text-[10px] truncate">Store metrics & sales</span>
             </div>
             {% if active_view == 'dashboard' %}
@@ -122,7 +122,7 @@
               <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Reports & Analytics</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Reports & Analytics</span>
               <span class="nav-desc text-[10px] truncate">Revenue & hourly stats</span>
             </div>
             {% if active_view == 'reports' %}
@@ -142,7 +142,7 @@
               <i data-lucide="package" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Products Catalog</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Products Catalog</span>
               <span class="nav-desc text-[10px] truncate">SKUs, pricing & tags</span>
             </div>
             {% if active_view == 'products' %}
@@ -155,7 +155,7 @@
               <i data-lucide="boxes" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Inventory Stock</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Inventory Stock</span>
               <span class="nav-desc text-[10px] truncate">Stock adjustments</span>
             </div>
             {% if active_view == 'inventory' %}
@@ -168,7 +168,7 @@
               <i data-lucide="receipt" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Orders & Sales</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Orders & Sales</span>
               <span class="nav-desc text-[10px] truncate">Transactions history</span>
             </div>
             {% if active_view == 'orders' %}
@@ -181,7 +181,7 @@
               <i data-lucide="file-text" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Invoices & Receipts</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Invoices & Receipts</span>
               <span class="nav-desc text-[10px] truncate">Thermal print & PDF</span>
             </div>
             {% if active_view == 'invoices' %}
@@ -194,7 +194,7 @@
               <i data-lucide="users" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Customers CRM</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Customers CRM</span>
               <span class="nav-desc text-[10px] truncate">Loyalty points & tiers</span>
             </div>
             {% if active_view == 'customers' %}
@@ -215,7 +215,7 @@
               <i data-lucide="shield-check" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Staff Accounts</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Staff Accounts</span>
               <span class="nav-desc text-[10px] truncate">Roles & permissions</span>
             </div>
             {% if active_view == 'users' %}
@@ -228,7 +228,7 @@
               <i data-lucide="hard-drive" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Database Backup</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Database Backup</span>
               <span class="nav-desc text-[10px] truncate">Snapshots & Google Drive</span>
             </div>
             {% if active_view == 'backup' %}
@@ -242,7 +242,7 @@
               <i data-lucide="settings" class="w-4 h-4"></i>
             </div>
             <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="font-semibold text-[12.5px] truncate">Store Settings</span>
+              <span class="nav-title font-semibold text-[12.5px] truncate">Store Settings</span>
               <span class="nav-desc text-[10px] truncate">Tax, receipt & currency</span>
             </div>
             {% if active_view == 'settings' %}
@@ -253,44 +253,27 @@
 
       </nav>
 
-      <!-- PWA Download & Offline Feature Card -->
-      <div class="px-3 py-2.5 border-t border-gray-800/80 bg-gray-900/30 shrink-0">
-        <div class="p-2.5 rounded-xl bg-gradient-to-br from-gray-800/70 via-gray-800/40 to-gray-900/80 border border-gray-700/60 shadow-sm">
-          <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 grid place-items-center">
-                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-              </div>
-              <span class="text-xs font-semibold text-gray-200">Progressive App</span>
-            </div>
-            <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PWA</span>
-          </div>
-          <p class="text-[10px] text-gray-400 leading-snug mb-2">Install on desktop or mobile for instant offline checkout.</p>
-          <button id="pwaSidebarBtn" onclick="triggerPwaInstall()" class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold transition-all">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-            <span class="truncate">Install Pulse POS</span>
-          </button>
-        </div>
-      </div>
-
       <!-- User Profile & Session Footer -->
       <div class="p-3 border-t border-gray-800/80 bg-[#090d16] shrink-0">
-        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-gray-800/40 border border-gray-800 hover:border-gray-700 transition-colors">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-bold text-xs grid place-items-center ring-2 ring-emerald-500/20 shrink-0">
+        <div class="flex items-center gap-1.5">
+          <a href="/profile" class="sidebar-nav-link flex-1 flex items-center gap-2.5 p-2 rounded-xl transition-all duration-200 group {% if active_view == 'profile' %}nav-link-active{% else %}bg-gray-800/40 hover:bg-gray-800/80 text-gray-200 border border-gray-800 hover:border-gray-700{% endif %}" title="Open My Profile">
+            <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-bold text-xs grid place-items-center ring-2 ring-emerald-500/20 shrink-0 group-hover:ring-emerald-400/40 transition-all">
               {{ (session.user_name or 'U')[:2] | upper }}
               <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-gray-900"></span>
             </div>
-            <div class="flex flex-col leading-tight min-w-0">
-              <span class="text-xs font-semibold text-gray-200 truncate">{{ session.user_name or 'User' }}</span>
+            <div class="flex flex-col leading-tight min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-1">
+                <span class="nav-title text-xs font-semibold truncate group-hover:text-white transition-colors">{{ session.user_name or 'User' }}</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+              </div>
               <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5">
                 <span class="capitalize px-1.5 py-0.2 rounded font-medium {% if session.user_role == 'admin' %}bg-purple-950/70 text-purple-300 border border-purple-800/60{% elif session.user_role == 'manager' %}bg-blue-950/70 text-blue-300 border border-blue-800/60{% else %}bg-emerald-950/70 text-emerald-300 border border-emerald-800/60{% endif %}">{{ session.user_role or 'cashier' }}</span>
                 <span class="text-gray-600">·</span>
                 <span class="text-emerald-400 flex items-center gap-0.5" title="Active 30-day persistent session"><i data-lucide="shield-check" class="w-2.5 h-2.5"></i> 30d</span>
               </div>
             </div>
-          </div>
-          <a href="/logout" class="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Sign Out">
+          </a>
+          <a href="/logout" onclick="return handleLogoutClick(event);" class="p-2.5 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all shrink-0" title="Sign Out">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </a>
         </div>
@@ -298,7 +281,7 @@
     </aside>
 
     <!-- Main area -->
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0 h-full">
       <!-- Header -->
       <header class="flex items-center gap-3 sm:gap-4 h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
         <!-- Mobile hamburger toggle button -->
@@ -349,8 +332,8 @@
       {% endwith %}
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto pos-scroll bg-gray-50 dark:bg-gray-950">
-        <div id="app">
+      <main id="mainContent" class="flex-1 min-h-0 bg-gray-50 dark:bg-gray-950 flex flex-col {% if active_view == 'pos' %}overflow-hidden h-full{% else %}overflow-y-auto pos-scroll{% endif %}">
+        <div id="app" class="flex-1 flex flex-col min-h-0 h-full">
         {% block content %}{% endblock %}
         </div>
       </main>
@@ -380,27 +363,23 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // Toggle Sales submenu
-    function toggleSales(e) {
-      e.stopPropagation();
-      const btn = e.currentTarget;
-      const sub = document.getElementById('salesSubmenu');
-      const chevron = btn.querySelector('[data-lucide="chevron-down"]');
-      const isOpen = sub.classList.contains('max-h-0');
-      sub.classList.toggle('max-h-0');
-      if (chevron) chevron.classList.toggle('rotate-180');
-      localStorage.setItem('quickpos-sales-open', isOpen ? '1' : '0');
-    }
-    // Restore Sales submenu state from localStorage
-    (function() {
-      const saved = localStorage.getItem('quickpos-sales-open');
-      if (saved === '1') {
-        const sub = document.getElementById('salesSubmenu');
-        const chevron = document.querySelector('#salesSubmenu')?.previousElementSibling?.querySelector('[data-lucide="chevron-down"]');
-        if (sub) sub.classList.remove('max-h-0');
-        if (chevron) chevron.classList.add('rotate-180');
+    // Toggle Mobile Sidebar drawer
+    function toggleMobileSidebar(force) {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (!sidebar || !backdrop) return;
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      const shouldOpen = typeof force === 'boolean' ? force : !isOpen;
+      if (shouldOpen) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
       }
-    })();
+    }
 
     // Auto-dismiss flash messages after 3s
     setTimeout(() => {
@@ -490,50 +469,88 @@
         if (h1 && newH1) h1.textContent = newH1.textContent;
         if (sub && newSub) sub.textContent = newSub.textContent;
 
-        // Update sidebar active state
-        var sidebar = document.querySelector('nav');
+        // Update sidebar active state with smooth state transitions
         var path = url.split('?')[0];
-        var salesKeys = ['products','orders','invoices','inventory','customers'];
-        var inSales = salesKeys.some(function (k) { return path.startsWith('/' + k); });
-        sidebar.querySelectorAll('a').forEach(function (a) {
+        document.querySelectorAll('.sidebar-nav-link').forEach(function (a) {
           var ah = a.getAttribute('href');
-          if (ah === '/users') { a.style.display = ''; } // ignore
-          var isTopNav = a.closest('[id="salesSubmenu"]') === null;
-          var active = ah === '/' ? path === '/' : ah !== '/' && path.startsWith(ah);
+          var active = ah === '/' ? path === '/' : (ah !== '/' && path.startsWith(ah));
           if (active) {
-            a.className = (isTopNav ? 'group w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all bg-primary-500 text-white shadow-sm' : 'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all bg-primary-600 text-white shadow-sm');
+            a.classList.add('nav-link-active');
+            a.classList.remove('nav-link-inactive');
+            if (ah === '/pos') {
+              a.classList.add('ring-2', 'ring-emerald-400/60', 'pos-hero-btn');
+            }
           } else {
-            a.className = (isTopNav ? 'group w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-gray-300 hover:bg-gray-800 hover:text-white' : 'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all text-gray-400 hover:bg-gray-800 hover:text-white');
+            a.classList.remove('nav-link-active');
+            a.classList.add('nav-link-inactive');
+            if (ah === '/pos') {
+              a.classList.remove('ring-2', 'ring-emerald-400/60', 'pos-hero-btn');
+            }
           }
         });
-        // Update Sales parent button
-        var salesBtn = sidebar.querySelector('button[onclick*="toggleSales"]');
-        if (salesBtn) {
-          if (inSales) {
-            salesBtn.className = 'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left bg-primary-500 text-white shadow-sm';
-          } else {
-            salesBtn.className = 'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left text-gray-300 hover:bg-gray-800 hover:text-white';
-          }
+
+        // Auto close mobile drawer on navigation
+        if (window.innerWidth < 1024) {
+          toggleMobileSidebar(false);
         }
-        // Auto-open Sales submenu if inside it
-        if (inSales) {
-          var sub = document.getElementById('salesSubmenu');
-          var chevron = document.querySelector('#salesSubmenu')?.previousElementSibling?.querySelector('[data-lucide="chevron-down"]');
-          if (sub) sub.classList.remove('max-h-0');
-          if (chevron) chevron.classList.add('rotate-180');
-          localStorage.setItem('quickpos-sales-open', '1');
+
+        // Adjust scroll container for POS terminal (pinned viewport) vs scrollable dashboard views
+        var mainEl = document.getElementById('mainContent');
+        if (mainEl) {
+          if (path === '/pos') {
+            mainEl.classList.remove('overflow-y-auto');
+            mainEl.classList.add('overflow-hidden', 'h-full');
+          } else {
+            mainEl.classList.add('overflow-y-auto');
+            mainEl.classList.remove('overflow-hidden', 'h-full');
+          }
         }
 
         // Push new URL state
         history.pushState({ url: url }, '', url);
 
-        // Re-execute scripts
+        // Re-execute scripts with safe scoping and POS re-initialization
         scripts.forEach(function (old) {
-          var s = document.createElement('script');
-          if (old.src) { s.src = old.src; }
-          else { s.textContent = old.textContent; }
-          document.body.appendChild(s);
+          if (old.src) {
+            var oldSrcAttr = old.getAttribute('src') || old.src;
+            var isPosScript = old.src.includes('pos.js') || (oldSrcAttr && oldSrcAttr.includes('pos.js'));
+            var existing = Array.from(document.scripts).some(function (s) {
+              return s.src === old.src || (s.getAttribute('src') && s.getAttribute('src') === oldSrcAttr) || (isPosScript && s.src.includes('pos.js'));
+            });
+
+            if (existing) {
+              if (isPosScript && typeof window.initPos === 'function') {
+                window.initPos();
+              }
+              return;
+            }
+            var s = document.createElement('script');
+            s.src = old.src;
+            s.onload = function () {
+              if (isPosScript && typeof window.initPos === 'function') {
+                window.initPos();
+              }
+            };
+            document.body.appendChild(s);
+          } else {
+            try {
+              // Execute inline script inside an isolated function scope
+              (new Function(old.textContent))();
+            } catch (err) {
+              console.warn('[SPA Inline Script Eval]', err);
+            }
+          }
         });
+
+        // If navigated to /pos, ensure POS is initialized
+        if (path === '/pos') {
+          if (typeof window.initPos === 'function') {
+            window.initPos();
+          }
+          setTimeout(function () {
+            if (typeof window.initPos === 'function') window.initPos();
+          }, 80);
+        }
 
         // Re-init Lucide
         if (window.lucide) lucide.createIcons();
@@ -597,7 +614,44 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <script data-app="base">
+    window.showToast = function (message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const isError = type === 'error';
+      const isWarning = type === 'warning';
+      const bgClass = isError
+        ? 'bg-red-600 text-white border-red-700 shadow-red-950/40'
+        : isWarning
+        ? 'bg-amber-600 text-white border-amber-700 shadow-amber-950/40'
+        : 'bg-emerald-600 text-white border-emerald-700 shadow-emerald-950/40';
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold border ${bgClass} transition-all duration-300 transform translate-y-2 opacity-0 backdrop-blur-sm`;
+      toast.innerHTML = `
+        <i data-lucide="${isError ? 'alert-triangle' : isWarning ? 'alert-circle' : 'check-circle'}" class="w-4 h-4 shrink-0"></i>
+        <span class="flex-1 leading-snug">${message}</span>
+        <button onclick="this.parentElement.remove()" class="p-1 hover:opacity-80 transition-opacity"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+      `;
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+  </script>
+
+  <script data-app="base" src="{{ url_for('static', filename='js/offline/db.js') }}"></script>
+  <script data-app="base" src="{{ url_for('static', filename='js/offline/repository.js') }}"></script>
+  <script data-app="base" src="{{ url_for('static', filename='js/offline/sync.js') }}"></script>
+  <script data-app="base" src="{{ url_for('static', filename='js/pwa.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

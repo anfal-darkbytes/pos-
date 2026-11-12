@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg_butter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#d97706" stop-opacity="0.08" />
+    </linearGradient>
+    <linearGradient id="badge_butter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="shadow_butter" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <rect width="200" height="200" rx="24" fill="url(#bg_butter)" />
+  <rect x="1" y="1" width="198" height="198" rx="23" fill="none" stroke="#f59e0b" stroke-opacity="0.25" stroke-width="1.5" />
+  
+  <!-- Central Icon Plate -->
+  <circle cx="100" cy="85" r="48" fill="white" filter="url(#shadow_butter)" opacity="0.95" />
+  <circle cx="100" cy="85" r="48" fill="url(#badge_butter)" opacity="0.12" />
+  <text x="100" y="103" font-size="44" text-anchor="middle" font-family="'Segoe UI Emoji', 'Apple Color Emoji', sans-serif">🧈</text>
+  
+  <!-- Product Label -->
+  <text x="100" y="158" font-size="13" font-weight="700" fill="#1f2937" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">Butter</text>
+  <text x="100" y="174" font-size="9.5" font-weight="600" fill="#f59e0b" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" letter-spacing="0.5">PREMIUM GROCERY</text>
+</svg>

@@ -20,8 +20,8 @@
       <input name="search" value="{{ search }}" placeholder="Search by order number or customer..." class="w-full pl-9 h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm focus:border-primary-500 focus:outline-none" />
     </div>
     <div class="flex gap-1.5">
-      {% for m in ['all', 'cash', 'card', 'wallet'] %}
-      <button type="submit" name="payment" value="{{ m }}" class="h-9 px-3 rounded-md text-xs font-medium capitalize {% if payment_filter == m %}bg-primary-500 text-white{% else %}border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800{% endif %}">{{ m == 'all' and 'All Methods' or m }}</button>
+      {% for m in ['all', 'cash', 'bank', 'wallet', 'split'] %}
+      <button type="submit" name="payment" value="{{ m }}" class="h-9 px-3 rounded-md text-xs font-medium capitalize {% if payment_filter == m or (m == 'bank' and payment_filter == 'card') %}bg-primary-500 text-white{% else %}border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800{% endif %}">{{ m == 'all' and 'All Methods' or (m == 'split' and 'Split Tender' or m) }}</button>
       {% endfor %}
     </div>
     <a href="/orders" class="h-9 px-3 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">Reset</a>
@@ -57,7 +57,7 @@
             <td class="px-4 py-3 text-sm">{{ o.customer_name }}</td>
             <td class="px-4 py-3 text-sm text-gray-500">{{ o.cashier_name }}</td>
             <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] border border-gray-200 dark:border-gray-700 tabular-nums">{{ o.items_count }} items</span></td>
-            <td class="px-4 py-3"><div class="flex items-center gap-1.5">{% if o.payment_method == 'cash' %}<i data-lucide="banknote" class="w-3.5 h-3.5 text-gray-400"></i>{% elif o.payment_method == 'card' %}<i data-lucide="credit-card" class="w-3.5 h-3.5 text-gray-400"></i>{% else %}<i data-lucide="wallet" class="w-3.5 h-3.5 text-gray-400"></i>{% endif %}<span class="text-xs capitalize">{{ o.payment_method }}</span></div></td>
+            <td class="px-4 py-3"><div class="flex items-center gap-1.5">{% if o.payment_method == 'cash' %}<i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-500"></i><span class="text-xs font-medium capitalize">Cash</span>{% elif o.payment_method in ['bank', 'card'] %}<i data-lucide="landmark" class="w-3.5 h-3.5 text-blue-500"></i><span class="text-xs font-medium capitalize">Bank</span>{% elif o.payment_method == 'split' %}<i data-lucide="pie-chart" class="w-3.5 h-3.5 text-amber-500"></i><span class="text-xs font-bold text-amber-600 dark:text-amber-400">Split Tender</span>{% else %}<i data-lucide="wallet" class="w-3.5 h-3.5 text-purple-500"></i><span class="text-xs font-medium capitalize">Wallet</span>{% endif %}</div></td>
             <td class="px-4 py-3 text-right tabular-nums text-sm">{{ o.subtotal | money }}</td>
             <td class="px-4 py-3 text-right tabular-nums text-sm text-gray-500">{{ o.tax | money }}</td>
             <td class="px-4 py-3 text-right tabular-nums text-sm">{% if o.discount > 0 %}<span class="text-red-600">-{{ o.discount | money }}</span>{% else %}—{% endif %}</td>
@@ -86,42 +86,68 @@
 </div>
 
 <script>
-const symbol = "{{ settings.currency_symbol }}";
-async function viewOrder(orderId) {
-  const res = await fetch('/orders/' + orderId);
-  const order = await res.json();
-  const body = document.getElementById('orderModalBody');
-  body.innerHTML = `
-    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
-      <div><p class="text-xs text-gray-500">Order #</p><p class="font-mono font-medium">${order.order_number}</p></div>
-      <div><p class="text-xs text-gray-500">Date</p><p class="font-medium">${new Date(order.created_at).toLocaleString()}</p></div>
-      <div><p class="text-xs text-gray-500">Customer</p><p class="font-medium">${order.customer_name}</p></div>
-      <div><p class="text-xs text-gray-500">Cashier</p><p class="font-medium">${order.cashier_name}</p></div>
-      <div><p class="text-xs text-gray-500">Payment</p><span class="inline-flex items-center px-2 py-0.5 rounded text-xs border border-gray-200 dark:border-gray-700 capitalize">${order.payment_method}</span></div>
-    </div>
-    <div class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden mb-4">
-      ${order.items.map(i => `
-        <div class="flex items-center gap-3 px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-          <div class="grid place-items-center w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-bold">${i.quantity}×</div>
-          <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${i.name}</p><p class="text-[11px] text-gray-500">${i.category_name || '—'}</p></div>
-          <div class="text-right"><p class="text-xs text-gray-500">${symbol}${i.price.toFixed(2)} ea</p><p class="text-sm font-semibold tabular-nums">${symbol}${i.subtotal.toFixed(2)}</p></div>
+(function () {
+  var symbol = window.currencySymbol || "{{ settings.currency_symbol }}";
+  async function viewOrder(orderId) {
+    const res = await fetch('/orders/' + orderId);
+    const order = await res.json();
+    const body = document.getElementById('orderModalBody');
+    body.innerHTML = `
+      <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+        <div><p class="text-xs text-gray-500">Order #</p><p class="font-mono font-medium">${order.order_number}</p></div>
+        <div><p class="text-xs text-gray-500">Date</p><p class="font-medium">${new Date(order.created_at).toLocaleString()}</p></div>
+        <div><p class="text-xs text-gray-500">Customer</p><p class="font-medium">${order.customer_name}</p></div>
+        <div><p class="text-xs text-gray-500">Cashier</p><p class="font-medium">${order.cashier_name}</p></div>
+        <div><p class="text-xs text-gray-500">Payment</p><span class="inline-flex items-center px-2 py-0.5 rounded text-xs border border-gray-200 dark:border-gray-700 capitalize">${order.payment_method}</span></div>
+      </div>
+      <div class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden mb-4">
+        ${order.items.map(i => `
+          <div class="flex items-center gap-3 px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
+            <div class="grid place-items-center w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-bold">${i.quantity}×</div>
+            <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${i.name}</p><p class="text-[11px] text-gray-500">${i.category_name || '—'}</p></div>
+            <div class="text-right"><p class="text-xs text-gray-500">${symbol}${i.price.toFixed(2)} ea</p><p class="text-sm font-semibold tabular-nums">${symbol}${i.subtotal.toFixed(2)}</p></div>
+          </div>
+        `).join('')}
+      </div>
+      ${order.payments && order.payments.length > 0 ? `
+        <div class="border border-gray-200 dark:border-gray-800 rounded-lg p-3 bg-gray-50/50 dark:bg-gray-800/40 mb-4 space-y-1.5">
+          <p class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Payment Tender Breakdown</p>
+          ${order.payments.map(p => `
+            <div class="flex items-center justify-between text-xs py-1 border-b border-gray-200/50 dark:border-gray-700/50 last:border-0">
+              <span class="font-medium text-gray-700 dark:text-gray-300 capitalize flex items-center gap-1.5">
+                ${p.payment_method === 'cash' ? '<i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-500"></i> Cash' : (p.payment_method === 'bank' ? '<i data-lucide="landmark" class="w-3.5 h-3.5 text-blue-500"></i> Bank: ' + (p.account_name || 'Bank') : '<i data-lucide="smartphone" class="w-3.5 h-3.5 text-purple-500"></i> Wallet: ' + (p.account_name || 'Wallet'))}
+                ${p.account_number ? `<span class="text-[10px] font-mono text-gray-400">(${p.account_number})</span>` : ''}
+                ${p.reference ? `<span class="text-[10px] bg-gray-200/60 dark:bg-gray-700 px-1.5 py-0.2 rounded font-mono text-gray-600 dark:text-gray-300">#${p.reference}</span>` : ''}
+              </span>
+              <span class="font-bold tabular-nums text-gray-900 dark:text-white">${symbol}${parseFloat(p.amount || 0).toFixed(2)}</span>
+            </div>
+            ${p.payment_method === 'cash' && p.change > 0 ? `
+              <div class="flex justify-between text-[11px] text-gray-400 pl-5">
+                <span>Tendered: ${symbol}${parseFloat(p.tendered || 0).toFixed(2)}</span>
+                <span>Change Due: ${symbol}${parseFloat(p.change || 0).toFixed(2)}</span>
+              </div>
+            ` : ''}
+          `).join('')}
         </div>
-      `).join('')}
-    </div>
-    <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-1.5 text-sm">
-      <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span class="tabular-nums">${symbol}${order.subtotal.toFixed(2)}</span></div>
-      <div class="flex justify-between"><span class="text-gray-500">Tax (${order.tax_rate}%)</span><span class="tabular-nums">${symbol}${order.tax.toFixed(2)}</span></div>
-      ${order.discount > 0 ? `<div class="flex justify-between"><span class="text-gray-500">Discount</span><span class="text-red-600 tabular-nums">-${symbol}${order.discount.toFixed(2)}</span></div>` : ''}
-      <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-200 dark:border-gray-700"><span>Total</span><span class="text-primary-600 tabular-nums">${symbol}${order.total.toFixed(2)}</span></div>
-    </div>
-  `;
-  document.getElementById('orderModal').classList.remove('hidden');
-  document.getElementById('orderModal').classList.add('flex');
-  if (window.lucide) lucide.createIcons();
-}
-function closeOrderModal() {
-  document.getElementById('orderModal').classList.add('hidden');
-  document.getElementById('orderModal').classList.remove('flex');
-}
+      ` : ''}
+      <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-1.5 text-sm">
+        <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span class="tabular-nums">${symbol}${order.subtotal.toFixed(2)}</span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Tax (${order.tax_rate}%)</span><span class="tabular-nums">${symbol}${order.tax.toFixed(2)}</span></div>
+        ${order.discount > 0 ? `<div class="flex justify-between"><span class="text-gray-500">Discount</span><span class="text-red-600 tabular-nums">-${symbol}${order.discount.toFixed(2)}</span></div>` : ''}
+        <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-200 dark:border-gray-700"><span>Total</span><span class="text-primary-600 tabular-nums">${symbol}${order.total.toFixed(2)}</span></div>
+      </div>
+    `;
+    document.getElementById('orderModal').classList.remove('hidden');
+    document.getElementById('orderModal').classList.add('flex');
+    if (window.lucide) lucide.createIcons();
+  }
+  function closeOrderModal() {
+    document.getElementById('orderModal').classList.add('hidden');
+    document.getElementById('orderModal').classList.remove('flex');
+  }
+
+  window.viewOrder = viewOrder;
+  window.closeOrderModal = closeOrderModal;
+})();
 </script>
 {% endblock %}

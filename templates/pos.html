@@ -4,28 +4,37 @@
 {% block page_subtitle %}Process a new sale{% endblock %}
 
 {% block content %}
-<div class="flex h-full overflow-hidden">
+<!-- POS Register View (Catalog & Active Cart) -->
+<div id="posRegisterView" class="flex-1 flex min-h-0 h-full w-full overflow-hidden">
   <!-- Left: product browser -->
-  <div class="flex-1 flex flex-col overflow-hidden">
+  <div class="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
     <div class="px-6 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       <div class="relative mb-2">
-        <i data-lucide="scan" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500 pointer-events-none"></i>
+        <i data-lucide="scan"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500 pointer-events-none"></i>
         <input id="barcodeInput" placeholder="Scan barcode..."
           class="w-full pl-9 pr-4 h-10 rounded-md border-2 border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 text-sm font-mono focus:border-primary-500 focus:outline-none placeholder:text-gray-400" />
       </div>
       <div class="relative mb-3">
-        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+        <i data-lucide="search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
         <input id="productSearch" oninput="filterProducts()" placeholder="Search products by name, SKU or barcode..."
           class="w-full pl-9 pr-4 h-10 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:border-primary-500 focus:outline-none" />
       </div>
-      <div class="flex items-center gap-2 overflow-x-auto pos-scroll pb-1" id="categoryTabs">
-        <button onclick="setCategory('all')" data-cat="all"
-          class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-500 text-white">All <span class="text-[10px] rounded-full px-1.5 py-0.5 bg-white/20">{{ products | length }}</span></button>
+      <div class="flex items-center gap-2 overflow-x-auto pos-scroll pb-1.5 pt-0.5" id="categoryTabs">
+        <button type="button" onclick="setCategory('all')" data-cat="all"
+          class="category-tab category-tab-active shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer active:scale-95">
+          <span class="w-2 h-2 rounded-full bg-white shrink-0"></span>
+          <span>All Items</span>
+          <span class="category-count text-[11px] font-mono tabular-nums opacity-90">({{ products | length }})</span>
+        </button>
         {% for c in categories %}
-        <button onclick="setCategory('{{ c.id }}')" data-cat="{{ c.id }}"
-          class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50">
-          {{ c.name }}
-          <span class="text-[10px] rounded-full px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700">{{ products | selectattr('category_id', 'equalto', c.id) | list | length }}</span>
+        {% set cat_count = products | selectattr('category_id', 'equalto', c.id) | list | length %}
+        <button type="button" onclick="setCategory('{{ c.id }}')" data-cat="{{ c.id }}"
+          class="category-tab category-tab-inactive shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer active:scale-95">
+          <span class="w-2 h-2 rounded-full shrink-0 shadow-sm" style="background: {{ c.color }}"></span>
+          <span>{{ c.name }}</span>
+          <span class="category-count text-[11px] font-mono tabular-nums">({{ cat_count }})</span>
         </button>
         {% endfor %}
       </div>
@@ -34,21 +43,39 @@
     <div class="flex-1 overflow-y-auto pos-scroll p-6">
       <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {% for p in products %}
-        <button data-product-id="{{ p.id | e }}"
-          data-product-cat="{{ p.category_id | e }}"
-          data-product-display-name="{{ p.name | e }}"
-          data-product-name="{{ p.name | lower | e }}"
-          data-product-sku="{{ p.sku | lower | e }}"
-          data-product-barcode="{{ (p.barcode or '') | lower | e }}"
-          data-product-price="{{ p.price }}"
-          data-product-cost="{{ p.cost }}"
-          data-product-stock="{{ p.stock }}"
-          {% if p.stock <= 0 %}disabled{% endif %}
-          class="product-btn group relative text-left rounded-xl border bg-white dark:bg-gray-900 hover:border-primary-500 hover:shadow-md transition-all overflow-hidden
+        <button type="button" onclick="handleProductClick(this, event)"
+          data-product-id="{{ p.id | e }}" data-product-cat="{{ p.category_id | e }}"
+          data-product-display-name="{{ p.name | e }}" data-product-name="{{ p.name | lower | e }}"
+          data-product-sku="{{ p.sku | lower | e }}" data-product-barcode="{{ (p.barcode or '') | lower | e }}"
+          data-product-price="{{ p.price }}" data-product-cost="{{ p.cost }}" data-product-stock="{{ p.stock }}" {% if
+          p.stock <=0 %}disabled{% endif %} class="product-btn group relative text-left rounded-xl border bg-white dark:bg-gray-900 hover:border-primary-500 hover:shadow-md transition-all overflow-hidden
           {% if p.stock <= 0 %}opacity-50 cursor-not-allowed{% endif %}">
-          <div class="h-20 relative grid place-items-center" style="background: linear-gradient(135deg, {{ p.category_color }}22, {{ p.category_color }}11)">
-            <span class="text-2xl font-bold opacity-70" style="color: {{ p.category_color }}">{{ p.name[:2] | upper }}</span>
-            {% if p.stock <= 0 %}<span class="absolute top-1.5 left-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Out</span>{% endif %}
+          <div
+            class="h-24 relative overflow-hidden bg-gray-50 dark:bg-gray-800/40 flex items-center justify-center p-2">
+            {% if p.image_url %}
+            <img src="{{ p.image_url }}" alt="{{ p.name }}"
+              class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <div class="hidden absolute inset-0 place-items-center"
+              style="background: linear-gradient(135deg, {{ p.category_color }}22, {{ p.category_color }}11)">
+              <span class="text-2xl font-bold opacity-70" style="color: {{ p.category_color }}">{{ p.name[:2] | upper
+                }}</span>
+            </div>
+            {% else %}
+            <div class="w-full h-full grid place-items-center"
+              style="background: linear-gradient(135deg, {{ p.category_color }}22, {{ p.category_color }}11)">
+              <span class="text-2xl font-bold opacity-70" style="color: {{ p.category_color }}">{{ p.name[:2] | upper
+                }}</span>
+            </div>
+            {% endif %}
+            {% if p.stock <= 0 %} <span
+              class="absolute top-1.5 left-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase shadow-sm">
+              Out</span>
+              {% elif p.is_low %}
+              <span
+                class="absolute top-1.5 left-1.5 bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase shadow-sm">Low:
+                {{ p.stock }}</span>
+              {% endif %}
           </div>
           <div class="p-2.5">
             <p class="text-xs font-medium line-clamp-2 leading-tight min-h-[2rem]">{{ p.name }}</p>
@@ -64,126 +91,862 @@
   </div>
 
   <!-- Right: cart panel -->
-  <div class="w-[380px] border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col overflow-hidden shrink-0">
-    <div class="px-4 h-14 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-        <span class="font-semibold text-sm">Current Sale</span>
-        <span id="cartCount" class="hidden text-[10px] bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full">0 items</span>
-      </div>
-      <button onclick="clearCart()" id="clearBtn" class="hidden text-xs text-red-600 hover:text-red-700 font-medium">Clear</button>
-    </div>
-
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
-      <div id="customerPicker" class="relative">
-        <div id="customerTag" class="hidden flex items-center gap-2 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-md px-3 py-1.5">
-          <i data-lucide="user" class="w-3.5 h-3.5 text-primary-600 shrink-0"></i>
-          <div class="flex-1 min-w-0"><p id="customerTagName" class="text-xs font-medium truncate"></p><p id="customerTagPhone" class="text-[10px] text-gray-500 truncate"></p></div>
-          <button onclick="clearCustomer()" class="grid place-items-center w-5 h-5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500"><i data-lucide="x" class="w-3 h-3"></i></button>
+  <div
+    class="w-[390px] xl:w-[420px] border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col min-h-0 h-full overflow-hidden shrink-0 shadow-xs">
+    <!-- Cart Header -->
+    <div
+      class="px-4 h-14 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0 bg-white dark:bg-gray-900">
+      <div class="flex items-center gap-2.5">
+        <div
+          class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-950/60 border border-primary-200/60 dark:border-primary-800/60 grid place-items-center text-primary-600 dark:text-primary-400 shadow-xs">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
         </div>
-        <input id="customerSearch" placeholder="Search customer by name or phone..."
-          class="w-full h-9 text-xs rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-2 focus:border-primary-500 focus:outline-none" />
-        <div id="customerDropdown" class="hidden absolute top-full left-0 right-0 z-20 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-48 overflow-y-auto pos-scroll"></div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Active Order</span>
+            <span id="cartCount"
+              class="hidden text-[10px] font-bold bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 px-2 py-0.5 rounded-full tabular-nums">0
+              items</span>
+          </div>
+        </div>
       </div>
-      <div id="noCustomers" class="text-[10px] text-gray-400 mt-1 hidden">No customers matching</div>
+      <button onclick="clearCart()" id="clearBtn" title="Clear current cart"
+        class="hidden text-xs text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 font-medium cursor-pointer">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        <span>Clear</span>
+      </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto pos-scroll">
-      <div id="cart" class="p-4 space-y-2 min-h-full">
-        <div id="emptyCart" class="h-full grid place-items-center text-center text-gray-400 py-16">
-          <div>
-            <i data-lucide="shopping-cart" class="w-10 h-10 mx-auto mb-2 opacity-30"></i>
-            <p class="text-sm font-medium">Empty cart</p>
-            <p class="text-xs mt-1">Tap products to start a sale</p>
+    <!-- Offline Queue Status Banner -->
+    <div id="offlineSyncBanner"
+      class="hidden px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-between shrink-0">
+      <span class="flex items-center gap-2 font-medium">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+        </span>
+        <span id="offlineCountText">0 offline sales stored</span>
+      </span>
+      <button onclick="syncOfflineOrders()" id="syncNowBtn"
+        class="px-2.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer">
+        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Sync Now
+      </button>
+    </div>
+
+    <!-- Customer / Loyalty Section -->
+    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-gray-900/50">
+      <div class="flex items-center justify-between mb-1.5">
+        <label for="customerSearch"
+          class="text-[11px] font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">Customer</label>
+        <span id="customerStatusBadge" class="text-[10px] font-medium text-gray-400">Walk-in</span>
+      </div>
+      <div id="customerPicker" class="relative">
+        <div id="customerTag"
+          class="hidden flex items-center justify-between gap-2.5 bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/80 rounded-xl px-3 py-2 shadow-xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div
+              class="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-xs grid place-items-center shadow-xs shrink-0">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="min-w-0">
+              <p id="customerTagName" class="text-xs font-bold text-gray-900 dark:text-white truncate"></p>
+              <p id="customerTagPhone" class="text-[10px] text-primary-700 dark:text-primary-300 font-medium truncate">
+              </p>
+            </div>
+          </div>
+          <button type="button" onclick="clearCustomer()" title="Remove customer"
+            class="w-6 h-6 rounded-md grid place-items-center hover:bg-white dark:hover:bg-gray-800 text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <div class="relative">
+          <i data-lucide="user-search"
+            class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+          <input id="customerSearch" placeholder="Search customer (name or phone)..."
+            class="w-full h-9 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-8 pr-3 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all placeholder:text-gray-400" />
+        </div>
+        <div id="customerDropdown"
+          class="hidden absolute top-full left-0 right-0 z-30 mt-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-56 overflow-y-auto pos-scroll divide-y divide-gray-100 dark:divide-gray-800">
+        </div>
+      </div>
+      <div id="noCustomers" class="text-[10px] text-gray-400 mt-1.5 hidden px-1 flex items-center gap-1"><i
+          data-lucide="alert-circle" class="w-3 h-3 text-gray-400"></i> No customers matching</div>
+    </div>
+
+    <!-- Cart Items Scroll Area -->
+    <div id="cartScrollContainer" class="flex-1 min-h-0 overflow-y-auto pos-scroll bg-gray-50/30 dark:bg-gray-900/30">
+      <div id="cart" class="p-3.5 space-y-2.5">
+        <div id="emptyCart" class="flex flex-col items-center justify-center text-center p-6 py-16 text-gray-400">
+          <div
+            class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/60 grid place-items-center mb-3 shadow-inner">
+            <i data-lucide="shopping-bag" class="w-8 h-8 text-gray-400 dark:text-gray-500"></i>
+          </div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">Active Cart is Empty</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[220px]">Scan a barcode or tap products from the
+            catalog to begin</p>
+          <div
+            class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Ready for Next Sale</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 shrink-0">
-      <div class="px-4 py-3 space-y-1.5">
-        <div class="flex items-center justify-between text-sm"><span class="text-gray-500">Subtotal</span><span id="subtotal" class="font-medium tabular-nums">{{ 0 | money }}</span></div>
-        <div class="flex items-center justify-between text-sm"><span class="text-gray-500">Tax ({{ settings.tax_rate }}%)</span><span id="tax" class="font-medium tabular-nums">{{ 0 | money }}</span></div>
-        <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500 flex items-center gap-1"><i data-lucide="percent" class="w-3 h-3"></i> Discount</span>
-          <input id="discountInput" type="number" min="0" step="0.01" value="0" oninput="updateTotals()"
-            class="w-24 h-7 text-right tabular-nums rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 text-sm focus:border-primary-500 focus:outline-none" placeholder="0.00" />
+    <!-- Totals & Checkout Panel (Fixed/Pinned at bottom) -->
+    <div
+      class="border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 backdrop-blur-xs shrink-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+      <div class="px-5 py-3.5 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400 font-medium">Subtotal</span>
+          <span id="subtotal" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
         </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 my-1.5"></div>
-        <div class="flex items-center justify-between">
-          <span class="font-semibold">Total</span>
-          <span id="total" class="text-xl font-bold tabular-nums text-primary-600">{{ 0 | money }}</span>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
+            <span>Tax</span>
+            <span
+              class="text-[10px] font-mono bg-gray-200/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-semibold">{{
+              settings.tax_rate }}%</span>
+          </span>
+          <span id="tax" class="font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{{ 0 | money }}</span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
+            <i data-lucide="tag" class="w-3.5 h-3.5 text-gray-400"></i>
+            <span>Discount</span>
+          </span>
+          <div class="relative flex items-center">
+            <span class="absolute left-2.5 text-xs font-semibold text-gray-400 pointer-events-none select-none">{{
+              settings.currency_symbol }}</span>
+            <input id="discountInput" type="number" min="0" step="0.01" value="0" oninput="updateTotals()"
+              placeholder="0.00"
+              class="w-24 h-7 pl-6 pr-2 text-right text-xs font-semibold tabular-nums rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all" />
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-200/80 dark:border-gray-700/80 pt-2.5 mt-1 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-extrabold text-gray-500 dark:text-gray-400">Total
+              Due</span>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">Incl. all taxes</p>
+          </div>
+          <span id="total"
+            class="text-2xl font-black tabular-nums text-primary-600 dark:text-primary-400 tracking-tight">{{ 0 | money
+            }}</span>
         </div>
       </div>
-      <div class="px-4 pb-4">
+      <div class="px-5 pb-5">
         <button id="chargeBtn" onclick="openCheckout()" disabled
-          class="w-full h-12 text-base font-semibold rounded-md bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
-          <i data-lucide="credit-card" class="w-5 h-5"></i>
-          <span>Charge <span id="chargeAmount">{{ 0 | money }}</span></span>
+          class="w-full h-12 rounded-xl bg-gradient-to-r from-primary-600 via-emerald-600 to-teal-600 hover:from-primary-500 hover:to-teal-500 active:scale-[0.99] text-white font-bold shadow-lg shadow-primary-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100 transition-all flex items-center justify-between px-4 group cursor-pointer">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-white/20 grid place-items-center backdrop-blur-xs">
+              <i data-lucide="credit-card" class="w-4 h-4 text-white"></i>
+            </div>
+            <div class="text-left">
+              <span class="text-xs uppercase tracking-wider font-extrabold block leading-tight">Charge</span>
+              <span class="text-[10px] font-medium text-white/80 block leading-none">Space / Enter</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span id="chargeAmount" class="text-lg font-black tabular-nums">{{ 0 | money }}</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5"></i>
+          </div>
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Checkout modal -->
-<div id="checkoutModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 modal-overlay">
-  <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-md w-full modal-content">
-    <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
-      <h3 class="font-semibold text-lg">Complete Payment</h3>
-      <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+<!-- Dedicated Full Checkout Screen -->
+<div id="posCheckoutView"
+  class="hidden flex-1 flex-col min-h-0 h-full w-full bg-gray-50/60 dark:bg-gray-950 overflow-hidden pos-view-enter">
+  <!-- Checkout Top Bar -->
+  <div
+    class="h-16 px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between shrink-0 shadow-xs">
+    <div class="flex items-center gap-3">
+      <button onclick="backToRegister()" type="button"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 transition-colors shadow-2xs cursor-pointer"
+        title="Return to POS register (Esc)">
+        <i data-lucide="arrow-left" class="w-4 h-4 text-gray-500"></i>
+        <span>Back to Register</span>
+        <kbd
+          class="hidden sm:inline-block text-[10px] bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-1.5 py-0.5 rounded font-mono text-gray-500">Esc</kbd>
+      </button>
+      <div class="h-5 w-px bg-gray-200 dark:bg-gray-800"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+        <h2 class="text-base font-black text-gray-900 dark:text-white tracking-tight">Checkout & Payment</h2>
+      </div>
     </div>
-    <div class="p-5 space-y-4">
-      <div class="grid grid-cols-3 gap-2">
-        {% for m in [('cash', 'banknote', 'Cash'), ('card', 'credit-card', 'Card'), ('wallet', 'wallet', 'Wallet')] %}
-        <button onclick="setPayment('{{ m[0] }}')" id="pay-{{ m[0] }}"
-          class="flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all
-          {% if m[0] == 'cash' %}border-primary-500 bg-primary-50 dark:bg-emerald-900/20{% else %}border-gray-200 dark:border-gray-700 hover:border-gray-400{% endif %}">
-          <i data-lucide="{{ m[1] }}" class="w-5 h-5 {% if m[0] == 'cash' %}text-primary-600{% else %}text-gray-400{% endif %}"></i>
-          <span class="text-xs font-medium {% if m[0] == 'cash' %}text-primary-600{% endif %}">{{ m[2] }}</span>
-        </button>
-        {% endfor %}
+    <div class="flex items-center gap-3">
+      <div
+        class="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium text-gray-600 dark:text-gray-300">
+        <i data-lucide="user" class="w-3.5 h-3.5 text-gray-400"></i>
+        <span>Cashier:</span>
+        <span id="coCashierBadge" class="font-bold text-gray-900 dark:text-white">Cashier</span>
       </div>
-
-      <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 space-y-1.5">
-        <div class="flex justify-between text-sm"><span class="text-gray-500">Subtotal</span><span class="tabular-nums" id="coSubtotal">{{ 0 | money }}</span></div>
-        <div class="flex justify-between text-sm"><span class="text-gray-500">Tax</span><span class="tabular-nums" id="coTax">{{ 0 | money }}</span></div>
-        <div class="flex justify-between text-sm hidden" id="coDiscRow"><span class="text-gray-500">Discount</span><span class="text-red-600 tabular-nums" id="coDiscount">-{{ 0 | money }}</span></div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between font-semibold text-base"><span>Total Due</span><span class="text-primary-600 tabular-nums" id="coTotal">{{ 0 | money }}</span></div>
+      <div id="coCustomerBadge"
+        class="flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200 dark:border-primary-800/60 text-xs font-semibold text-primary-700 dark:text-primary-300">
+        <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+        <span id="coCustomerName">Walk-in Customer</span>
       </div>
+    </div>
+  </div>
 
-      <div id="cashSection" class="space-y-2">
-        <label class="text-xs font-medium text-gray-600">Cash Received</label>
-        <input id="paidAmount" type="number" min="0" step="0.01" oninput="updateChange()"
-          class="w-full text-lg font-semibold h-12 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 focus:border-primary-500 focus:outline-none" />
-        <div id="changeRow" class="hidden flex justify-between bg-emerald-50 dark:bg-emerald-900/20 rounded-lg px-3 py-2 text-sm">
-          <span class="text-emerald-700 dark:text-emerald-400">Change Due</span>
-          <span class="font-bold text-emerald-700 dark:text-emerald-400 tabular-nums" id="changeAmount">{{ 0 | money }}</span>
+  <!-- Checkout Two-Column Main Content -->
+  <div class="flex-1 flex min-h-0 overflow-hidden">
+    <!-- Left Column: Payment Method Selection & Tender Form -->
+    <div class="flex-1 min-h-0 overflow-y-auto pos-scroll p-6 lg:p-8 space-y-6">
+
+      <!-- Payment Tender Mode Switch (Full vs. Split Payment) -->
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-3.5 shadow-xs">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <div
+              class="w-7 h-7 rounded-lg bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400 grid place-items-center">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span
+                class="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 block leading-tight">Payment
+                Tender Mode</span>
+              <span class="text-[10px] text-gray-400 block leading-tight">Choose single payment or multi-tender
+                split</span>
+            </div>
+          </div>
+          <span id="paymentModeBadge"
+            class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            Full Payment
+          </span>
         </div>
-        <div class="flex gap-2" id="quickCash"></div>
+
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl">
+          <button type="button" onclick="setPaymentMode('full')" id="mode-full-btn"
+            class="py-2.5 px-3 rounded-lg text-xs font-bold transition-all shadow-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 cursor-pointer">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+            <span>Full Payment</span>
+          </button>
+          <button type="button" onclick="setPaymentMode('split')" id="mode-split-btn"
+            class="py-2.5 px-3 rounded-lg text-xs font-medium transition-all text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex items-center justify-center gap-2 cursor-pointer">
+            <i data-lucide="pie-chart" class="w-4 h-4"></i>
+            <span>Split / Half Payment</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── MODE A: FULL PAYMENT CONTAINER ─────────────────────── -->
+      <div id="fullPaymentContainer" class="space-y-6">
+        <!-- 1. Select Payment Method Cards -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">1. Select
+              Payment Method</label>
+            <span class="text-xs text-primary-600 dark:text-primary-400 font-semibold" id="selectedMethodLabel">Cash
+              Selected</span>
+          </div>
+          <div class="grid grid-cols-3 gap-3.5">
+            <!-- Cash Method -->
+            <button type="button" onclick="setPayment('cash')" id="pay-cash"
+              class="payment-method-card payment-method-card-active relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all bg-white dark:bg-gray-900 text-center shadow-xs cursor-pointer">
+              <div
+                class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 grid place-items-center mb-2 shadow-2xs">
+                <i data-lucide="banknote" class="w-6 h-6"></i>
+              </div>
+              <span class="text-sm font-bold text-gray-900 dark:text-white">Cash</span>
+              <span class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Physical tender & change</span>
+              <div class="selected-indicator absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-emerald-500"></div>
+            </button>
+
+            <!-- Bank Method -->
+            <button type="button" onclick="setPayment('bank')" id="pay-bank"
+              class="payment-method-card relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all bg-white dark:bg-gray-900 text-center shadow-xs cursor-pointer">
+              <div
+                class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 grid place-items-center mb-2 shadow-2xs">
+                <i data-lucide="landmark" class="w-6 h-6"></i>
+              </div>
+              <span class="text-sm font-bold text-gray-900 dark:text-white">Bank</span>
+              <span class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Terminal / Wire / Card</span>
+              <div class="selected-indicator hidden absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-blue-500"></div>
+            </button>
+
+            <!-- Wallet Method -->
+            <button type="button" onclick="setPayment('wallet')" id="pay-wallet"
+              class="payment-method-card relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all bg-white dark:bg-gray-900 text-center shadow-xs cursor-pointer">
+              <div
+                class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 grid place-items-center mb-2 shadow-2xs">
+                <i data-lucide="smartphone" class="w-6 h-6"></i>
+              </div>
+              <span class="text-sm font-bold text-gray-900 dark:text-white">Wallet</span>
+              <span class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Easypaisa / JazzCash / Mobile</span>
+              <div class="selected-indicator hidden absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-purple-500">
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Payment Method Specific Fields -->
+        <div class="space-y-4">
+          <!-- 2.1 Cash Tender Section -->
+          <div id="cashSection"
+            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">2. Cash
+                  Received</h3>
+                <p class="text-[11px] text-gray-400">Exact amount auto-filled &bull; change calculates automatically</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                  <i data-lucide="check" class="w-3 h-3"></i> Exact Auto-Filled
+                </span>
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Total: <span
+                    id="cashDueText">$0.00</span></span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400 select-none">{{
+                  settings.currency_symbol }}</span>
+                <input id="paidAmount" type="number" min="0" step="0.01" oninput="updateChange()" placeholder="0.00"
+                  class="w-full text-2xl font-black tabular-nums h-14 rounded-xl border-2 border-emerald-500/40 dark:border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/15 pl-10 pr-4 text-gray-900 dark:text-white focus:border-emerald-600 focus:bg-white dark:focus:bg-gray-900 focus:ring-0 focus:outline-none transition-all" />
+              </div>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                <span>Full payment auto-filled. Type a higher amount only if the customer handed larger bills.</span>
+              </p>
+            </div>
+
+            <!-- Quick Cash Suggestion Buttons -->
+            <div>
+              <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1.5">Quick Tender
+                Shortcuts</label>
+              <div class="grid grid-cols-4 gap-2" id="quickCash"></div>
+            </div>
+
+            <!-- Realtime Change Due Banner -->
+            <div id="changeRow"
+              class="hidden rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/40 p-4 transition-all">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white grid place-items-center shadow-xs">
+                    <i data-lucide="coins" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <span
+                      class="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Change
+                      Due</span>
+                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Return to customer</p>
+                  </div>
+                </div>
+                <span class="text-2xl font-black text-emerald-700 dark:text-emerald-300 tabular-nums tracking-tight"
+                  id="changeAmount">{{ 0 | money }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2.2 Bank Terminal Section -->
+          <div id="bankSection"
+            class="hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">2. Bank Account
+                  & Terminal</h3>
+                <p class="text-[11px] text-gray-400">Full payment received via bank account / card terminal</p>
+              </div>
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
+                <i data-lucide="landmark" class="w-3 h-3"></i>
+                <span>Bank Active</span>
+              </span>
+            </div>
+
+            <!-- Full Bank Payment Banner (Zero Amount Re-entry) -->
+            <div id="fullBankBanner"
+              class="p-3.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/70 dark:bg-blue-950/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500 text-white grid place-items-center shrink-0 shadow-2xs">
+                  <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-black uppercase tracking-wider text-blue-900 dark:text-blue-100">Full Order Balance:</span>
+                    <span class="text-base font-black text-blue-700 dark:text-blue-300 tabular-nums" id="fullBankTotalDisplay">$0.00</span>
+                  </div>
+                  <p class="text-[11px] text-blue-600 dark:text-blue-400 font-medium">100% full balance received via Bank. No amount re-entry required.</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shrink-0">
+                <i data-lucide="zap" class="w-3 h-3"></i> Full Paid
+              </span>
+            </div>
+
+            <!-- Bank Account Selector -->
+            <div>
+              <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 block mb-1.5">Select Receiving Bank
+                Account</label>
+              <select id="fullBankAccountId" onchange="onBankSelectChange()"
+                class="w-full h-11 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 text-gray-900 dark:text-white font-medium focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all">
+                {% for a in payment_accounts %}{% if a.category == 'bank' %}
+                <option value="{{ a.id }}" data-name="{{ a.name | e }}" data-title="{{ a.account_name | e }}"
+                  data-num="{{ a.account_number | e }}" {% if a.is_default %}selected{% endif %}>
+                  {{ a.name }} — {{ a.account_name }} ({{ a.account_number }})
+                </option>
+                {% endif %}{% endfor %}
+              </select>
+            </div>
+
+            <!-- Selected Bank Details Card -->
+            <div id="fullBankDetailsCard"
+              class="p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div
+                  class="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300 grid place-items-center shrink-0">
+                  <i data-lucide="landmark" class="w-4 h-4"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-xs text-gray-900 dark:text-white truncate" id="fullBankNameDisplay">—</p>
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate">Title: <span
+                      id="fullBankTitleDisplay" class="font-medium text-gray-700 dark:text-gray-300">—</span></p>
+                </div>
+              </div>
+              <span
+                class="font-mono text-xs font-semibold px-2 py-1 rounded-md bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 shrink-0 select-all"
+                id="fullBankNumDisplay">—</span>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 block mb-1.5">Card / Bank Approval
+                Reference (Optional)</label>
+              <input id="bankRefInput" placeholder="e.g. Card last 4 (4242) or Auth #88219..."
+                class="w-full h-11 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 text-gray-900 dark:text-white focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all placeholder:text-gray-400" />
+            </div>
+          </div>
+
+          <!-- 2.3 Digital Wallet Section -->
+          <div id="walletSection"
+            class="hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">2. Digital /
+                  Mobile Wallet</h3>
+                <p class="text-[11px] text-gray-400">Full payment received via digital / mobile wallet</p>
+              </div>
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60">
+                <i data-lucide="smartphone" class="w-3 h-3"></i>
+                <span>Wallet Active</span>
+              </span>
+            </div>
+
+            <!-- Full Wallet Payment Banner (Zero Amount Re-entry) -->
+            <div id="fullWalletBanner"
+              class="p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/70 dark:bg-purple-950/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500 text-white grid place-items-center shrink-0 shadow-2xs">
+                  <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-black uppercase tracking-wider text-purple-900 dark:text-purple-100">Full Order Balance:</span>
+                    <span class="text-base font-black text-purple-700 dark:text-purple-300 tabular-nums" id="fullWalletTotalDisplay">$0.00</span>
+                  </div>
+                  <p class="text-[11px] text-purple-600 dark:text-purple-400 font-medium">100% full balance received via Mobile Wallet. No amount re-entry required.</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 shrink-0">
+                <i data-lucide="zap" class="w-3 h-3"></i> Full Paid
+              </span>
+            </div>
+
+            <!-- Wallet Account Selector -->
+            <div>
+              <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 block mb-1.5">Select Receiving Mobile
+                Wallet</label>
+              <select id="fullWalletAccountId" onchange="onWalletSelectChange()"
+                class="w-full h-11 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 text-gray-900 dark:text-white font-medium focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all">
+                {% for a in payment_accounts %}{% if a.category == 'wallet' %}
+                <option value="{{ a.id }}" data-name="{{ a.name | e }}" data-title="{{ a.account_name | e }}"
+                  data-num="{{ a.account_number | e }}" {% if a.is_default %}selected{% endif %}>
+                  {{ a.name }} — {{ a.account_name }} ({{ a.account_number }})
+                </option>
+                {% endif %}{% endfor %}
+              </select>
+            </div>
+
+            <!-- Selected Wallet Details Card -->
+            <div id="fullWalletDetailsCard"
+              class="p-3.5 rounded-xl border border-purple-100 dark:border-purple-900/40 bg-purple-50/40 dark:bg-purple-950/20 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div
+                  class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 grid place-items-center shrink-0">
+                  <i data-lucide="smartphone" class="w-4 h-4"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-xs text-gray-900 dark:text-white truncate" id="fullWalletNameDisplay">—</p>
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate">Title: <span
+                      id="fullWalletTitleDisplay" class="font-medium text-gray-700 dark:text-gray-300">—</span></p>
+                </div>
+              </div>
+              <span
+                class="font-mono text-xs font-semibold px-2 py-1 rounded-md bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 shrink-0 select-all"
+                id="fullWalletNumDisplay">—</span>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 block mb-1.5">Customer Mobile /
+                Wallet Reference (Optional)</label>
+              <input id="walletRefInput" placeholder="e.g. Customer mobile # or transaction ref..."
+                class="w-full h-11 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 text-gray-900 dark:text-white focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all placeholder:text-gray-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MODE B: SPLIT / MULTI-TENDER PAYMENT CONTAINER ─────── -->
+      <div id="splitPaymentContainer" class="hidden space-y-5">
+        <!-- Live Multi-Tender Allocation Status Banner -->
+        <div
+          class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">Split Payment
+                Distribution</h3>
+              <p class="text-[11px] text-gray-400">Allocate order total across multiple methods (Cash, Bank, Wallet)</p>
+            </div>
+            <span id="splitStatusBadge"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+              <span id="splitStatusText">Unallocated</span>
+            </span>
+          </div>
+
+          <!-- Allocation Metric Cards -->
+          <div class="grid grid-cols-3 gap-3 pt-1">
+            <div
+              class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-center">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Due</span>
+              <span class="text-base font-black text-gray-900 dark:text-white tabular-nums" id="splitOrderTotalText">{{
+                0 | money }}</span>
+            </div>
+            <div
+              class="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 text-center">
+              <span
+                class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">Allocated</span>
+              <span class="text-base font-black text-blue-700 dark:text-blue-300 tabular-nums"
+                id="splitAllocatedText">{{ 0 | money }}</span>
+            </div>
+            <div
+              class="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 text-center"
+              id="splitRemainingCard">
+              <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block"
+                id="splitRemainingLabel">Remaining</span>
+              <span class="text-base font-black text-amber-700 dark:text-amber-300 tabular-nums"
+                id="splitRemainingText">{{ 0 | money }}</span>
+            </div>
+          </div>
+
+          <!-- Visual Allocation Progress Bar -->
+          <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden flex">
+            <div id="splitProgressCash" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%">
+            </div>
+            <div id="splitProgressBank" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
+            <div id="splitProgressWallet" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%">
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Tender Rows -->
+        <div class="space-y-3.5">
+          <!-- 1. Cash Tender Row -->
+          <div
+            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div
+                  class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 grid place-items-center">
+                  <i data-lucide="banknote" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-gray-900 dark:text-white block">Cash Tender</span>
+                  <span class="text-[10px] text-gray-400">Physical paper currency</span>
+                </div>
+              </div>
+              <button type="button" onclick="fillSplitRemaining('cash')"
+                class="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/80 transition-colors cursor-pointer">
+                Fill Remaining
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Cash Amount to
+                  Pay</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                    settings.currency_symbol }}</span>
+                  <input type="number" min="0" step="0.01" id="splitCashAmount" oninput="updateSplitMath('cash')"
+                    placeholder="0.00"
+                    class="w-full h-10 pl-7 pr-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs font-bold tabular-nums text-gray-900 dark:text-white focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Cash Received (For
+                  Change)</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                    settings.currency_symbol }}</span>
+                  <input type="number" min="0" step="0.01" id="splitCashTendered" oninput="updateSplitMath('cash')"
+                    placeholder="0.00"
+                    class="w-full h-10 pl-7 pr-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs font-bold tabular-nums text-gray-900 dark:text-white focus:border-emerald-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Cash Change Banner -->
+            <div id="splitCashChangeRow"
+              class="hidden p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between text-xs">
+              <span class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                <i data-lucide="coins" class="w-3.5 h-3.5"></i> Cash Change Due:
+              </span>
+              <span class="text-sm font-black tabular-nums text-emerald-700 dark:text-emerald-300"
+                id="splitCashChangeAmount">{{ 0 | money }}</span>
+            </div>
+          </div>
+
+          <!-- 2. Bank Account Tender Row -->
+          <div
+            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div
+                  class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 grid place-items-center">
+                  <i data-lucide="landmark" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-gray-900 dark:text-white block">Bank Account / Card Tender</span>
+                  <span class="text-[10px] text-gray-400">Direct wire transfer or card swipe</span>
+                </div>
+              </div>
+              <button type="button" onclick="fillSplitRemaining('bank')"
+                class="text-[11px] font-bold text-blue-700 dark:text-blue-300 hover:text-blue-800 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/80 transition-colors cursor-pointer">
+                Fill Remaining
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Select Bank
+                  Account</label>
+                <select id="splitBankAccountId"
+                  class="w-full h-10 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-2.5 text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all">
+                  {% for a in payment_accounts %}{% if a.category == 'bank' %}
+                  <option value="{{ a.id }}" data-name="{{ a.name | e }}" data-title="{{ a.account_name | e }}"
+                    data-num="{{ a.account_number | e }}" {% if a.is_default %}selected{% endif %}>
+                    {{ a.name }} ({{ a.account_number }})
+                  </option>
+                  {% endif %}{% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Bank Amount to
+                  Pay</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                    settings.currency_symbol }}</span>
+                  <input type="number" min="0" step="0.01" id="splitBankAmount" oninput="updateSplitMath('bank')"
+                    placeholder="0.00"
+                    class="w-full h-10 pl-7 pr-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs font-bold tabular-nums text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Ref / Auth #
+                  (Optional)</label>
+                <input type="text" id="splitBankRef" placeholder="e.g. Card 4242 / Wire ref"
+                  class="w-full h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Mobile Wallet Tender Row -->
+          <div
+            class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div
+                  class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 grid place-items-center">
+                  <i data-lucide="smartphone" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-gray-900 dark:text-white block">Mobile Wallet Tender</span>
+                  <span class="text-[10px] text-gray-400">Easypaisa, JazzCash, Nayapay, etc.</span>
+                </div>
+              </div>
+              <button type="button" onclick="fillSplitRemaining('wallet')"
+                class="text-[11px] font-bold text-purple-700 dark:text-purple-300 hover:text-purple-800 bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-800/80 transition-colors cursor-pointer">
+                Fill Remaining
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Select Mobile
+                  Wallet</label>
+                <select id="splitWalletAccountId"
+                  class="w-full h-10 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-2.5 text-gray-900 dark:text-white font-medium focus:border-purple-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all">
+                  {% for a in payment_accounts %}{% if a.category == 'wallet' %}
+                  <option value="{{ a.id }}" data-name="{{ a.name | e }}" data-title="{{ a.account_name | e }}"
+                    data-num="{{ a.account_number | e }}" {% if a.is_default %}selected{% endif %}>
+                    {{ a.name }} ({{ a.account_number }})
+                  </option>
+                  {% endif %}{% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">Wallet Amount to
+                  Pay</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">{{
+                    settings.currency_symbol }}</span>
+                  <input type="number" min="0" step="0.01" id="splitWalletAmount" oninput="updateSplitMath('wallet')"
+                    placeholder="0.00"
+                    class="w-full h-10 pl-7 pr-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs font-bold tabular-nums text-gray-900 dark:text-white focus:border-purple-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-gray-600 dark:text-gray-400 block mb-1">TRX ID / Mobile #
+                  (Optional)</label>
+                <input type="text" id="splitWalletRef" placeholder="e.g. TRX#9821 or 0300..."
+                  class="w-full h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-xs text-gray-900 dark:text-white focus:border-purple-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Optional Order Notes -->
+      <div
+        class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs space-y-2">
+        <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 block">3. Order Note / Instructions
+          (Optional)</label>
+        <input id="orderNoteInput" placeholder="Add internal notes, customer request, or split breakdown remarks..."
+          class="w-full h-10 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 text-gray-900 dark:text-white focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all placeholder:text-gray-400" />
       </div>
     </div>
-    <div class="flex gap-2 p-5 pt-0">
-      <button onclick="closeCheckout()" class="flex-1 h-10 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium">Cancel</button>
-      <button onclick="processSale()" id="processBtn" class="flex-1 h-10 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold">Complete Sale</button>
+
+    <!-- Right Column: Complete Order Summary -->
+    <div
+      class="w-[420px] xl:w-[460px] border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col min-h-0 overflow-hidden shrink-0 shadow-lg">
+      <!-- Order Summary Header -->
+      <div
+        class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0 bg-white dark:bg-gray-900">
+        <div class="flex items-center gap-2">
+          <i data-lucide="receipt" class="w-4 h-4 text-primary-600"></i>
+          <span class="font-bold text-sm text-gray-900 dark:text-white">Order Summary</span>
+        </div>
+        <span id="coItemCount"
+          class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800/60 tabular-nums">0
+          items</span>
+      </div>
+
+      <!-- Customer Profile Summary Card -->
+      <div id="coCustomerCard"
+        class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 shrink-0">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 font-bold text-xs grid place-items-center shrink-0 ring-1 ring-primary-500/20">
+            <span id="coCustomerAvatar">W</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p id="coCustomerCardName" class="text-xs font-bold text-gray-900 dark:text-white truncate">Walk-in Customer
+            </p>
+            <p id="coCustomerCardMeta" class="text-[10px] text-gray-500 truncate">No loyalty profile attached</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Itemized List -->
+      <div class="flex-1 min-h-0 overflow-y-auto pos-scroll p-4">
+        <div id="checkoutItemList" class="space-y-2"></div>
+      </div>
+
+      <!-- Totals Breakdown & Complete Order CTA -->
+      <div
+        class="p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 backdrop-blur-xs shrink-0 space-y-2.5">
+        <div class="flex justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+          <span class="tabular-nums font-semibold text-gray-800 dark:text-gray-200" id="coSubtotal">{{ 0 | money
+            }}</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+            <span>Tax</span>
+            <span
+              class="text-[10px] font-mono bg-gray-200/80 dark:bg-gray-700/80 px-1.5 py-0.5 rounded font-semibold">{{
+              settings.tax_rate }}%</span>
+          </span>
+          <span class="tabular-nums font-semibold text-gray-800 dark:text-gray-200" id="coTax">{{ 0 | money }}</span>
+        </div>
+        <div class="flex justify-between text-xs hidden" id="coDiscRow">
+          <span class="text-gray-500 dark:text-gray-400">Discount Applied</span>
+          <span class="text-red-600 dark:text-red-400 tabular-nums font-semibold" id="coDiscount">-{{ 0 | money
+            }}</span>
+        </div>
+        <div class="border-t border-gray-200/80 dark:border-gray-700/80 pt-2 flex justify-between items-baseline">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-extrabold text-gray-500 dark:text-gray-400">Total
+              Due</span>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500">All taxes included</p>
+          </div>
+          <span class="text-2xl font-black text-primary-600 dark:text-primary-400 tabular-nums tracking-tight"
+            id="coTotal">{{ 0 | money }}</span>
+        </div>
+
+        <div class="pt-2">
+          <button type="button" onclick="processSale()" id="processBtn"
+            class="w-full h-12 rounded-xl bg-gradient-to-r from-primary-600 via-emerald-600 to-teal-600 hover:from-primary-500 hover:to-teal-500 text-white font-bold shadow-lg shadow-primary-600/25 active:scale-[0.99] flex items-center justify-between px-5 transition-all cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-white"></i>
+              <span class="text-xs uppercase tracking-wider font-bold">Complete Payment</span>
+            </div>
+            <span id="coPayBtnAmount" class="text-lg font-black tabular-nums">{{ 0 | money }}</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Receipt modal -->
-<div id="receiptModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 modal-overlay">
-  <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-sm w-full modal-content">
-    <div class="p-5 text-center">
-      <div class="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/40 grid place-items-center mx-auto mb-2">
-        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-600"></i>
+<div id="receiptModal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4 modal-overlay">
+  <div
+    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 max-w-sm w-full modal-content overflow-hidden">
+    <div class="p-6 text-center border-b border-gray-100 dark:border-gray-800 bg-emerald-50/50 dark:bg-emerald-950/20">
+      <div
+        class="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 grid place-items-center mx-auto mb-2.5 text-emerald-600 dark:text-emerald-400 shadow-xs">
+        <i data-lucide="check-circle-2" class="w-7 h-7"></i>
       </div>
-      <h3 class="text-lg font-semibold">Payment Successful</h3>
-      <p class="text-xs text-gray-500" id="receiptOrderNumber">Order</p>
+      <h3 class="text-base font-bold text-gray-900 dark:text-white">Payment Successful</h3>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" id="receiptOrderNumber">Order</p>
     </div>
-    <div id="receiptBody" class="px-5 pb-5"></div>
-    <div class="flex gap-2 px-5 pb-5">
-      <button onclick="window.print()" class="flex-1 h-10 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 text-sm font-medium flex items-center justify-center gap-1"><i data-lucide="printer" class="w-4 h-4"></i> Print</button>
-      <button onclick="closeReceipt()" class="flex-1 h-10 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold">New Sale</button>
+    <div id="receiptBody" class="p-5 max-h-[50vh] overflow-y-auto pos-scroll"></div>
+    <div class="flex gap-2.5 p-5 pt-0">
+      <button onclick="window.print()"
+        class="flex-1 h-10 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Print Receipt</span>
+      </button>
+      <button onclick="closeReceipt()"
+        class="flex-1 h-10 rounded-xl bg-gradient-to-r from-primary-600 to-emerald-600 hover:from-primary-500 hover:to-emerald-500 text-white text-xs font-bold shadow-md shadow-primary-600/20 transition-all cursor-pointer">
+        New Sale
+      </button>
     </div>
   </div>
 </div>
@@ -192,16 +955,74 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/pos.js') }}"></script>
 <script>
+(function () {
   window.taxRate = {{ settings.tax_rate }};
   window.currencySymbol = "{{ settings.currency_symbol }}";
   window.storeName = "{{ settings.store_name | e }}";
   window.storeAddress = "{{ settings.address | e }}";
   window.storePhone = "{{ settings.phone | e }}";
   window.receiptFooter = "{{ settings.receipt_footer | e }}";
+  window.currentUserName = "{{ (session.user_name or (user.get_full_name() if user.is_authenticated else '') or user.username or 'Cashier') | e }}";
   window.customers = [
     {% for c in customers %}{% if c.name != "Walk-in Customer" %}
     { id: "{{ c.id }}", name: "{{ c.name | e }}", phone: "{{ (c.phone or '') | e }}", pts: {{ c.loyalty_points }} },
     {% endif %}{% endfor %}
   ];
+
+  window.paymentAccounts = [
+    {% for a in payment_accounts %}
+    {
+      id: "{{ a.id }}",
+      category: "{{ a.category }}",
+      name: "{{ a.name | e }}",
+      account_name: "{{ a.account_name | e }}",
+      account_number: "{{ a.account_number | e }}",
+      is_active: {{ 1 if a.is_active else 0 }},
+      is_default: {{ 1 if a.is_default else 0 }}
+    },
+    {% endfor %}
+  ];
+
+  // Prime IndexedDB with initial server-rendered dataset if available
+  if (window.PulseRepos) {
+    const initProducts = [
+      {% for p in products %}
+      {
+        id: "{{ p.id }}",
+        name: "{{ p.name | e }}",
+        sku: "{{ p.sku | e }}",
+        barcode: "{{ (p.barcode or '') | e }}",
+        category_id: "{{ p.category_id }}",
+        price: {{ p.price }},
+        cost: {{ p.cost }},
+        stock: {{ p.stock }},
+        unit: "{{ p.unit }}",
+        image_url: "{{ p.image_url or '' }}",
+        is_active: {{ 1 if p.is_active else 0 }}
+      },
+      {% endfor %}
+    ];
+    window.PulseRepos.products.bulkSave(initProducts);
+
+    const initCategories = [
+      {% for c in categories %}
+      { id: "{{ c.id }}", name: "{{ c.name | e }}", color: "{{ c.color }}" },
+      {% endfor %}
+    ];
+    window.PulseRepos.categories.bulkSave(initCategories);
+
+    if (window.PulseRepos.paymentAccounts && Array.isArray(window.paymentAccounts)) {
+      window.PulseRepos.paymentAccounts.bulkSave(window.paymentAccounts);
+    }
+  }
+
+  if (window.PulseSync) {
+    window.PulseSync.updateStatusUI();
+  }
+
+  if (typeof window.initPos === 'function') {
+    window.initPos();
+  }
+})();
 </script>
 {% endblock %}

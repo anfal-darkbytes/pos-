@@ -70,8 +70,15 @@
             <tr data-product-name="{{ p.name | lower }}" data-product-sku="{{ p.sku | lower }}" data-product-barcode="{{ (p.barcode or '') | lower }}" data-product-cat="{{ p.category_id }}" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg grid place-items-center text-xs font-bold shrink-0" style="background: {{ p.category_color }}22; color: {{ p.category_color }}">{{ p.name[:2] | upper }}</div>
-                  <div class="min-w-0"><p class="font-medium truncate">{{ p.name }}</p><p class="text-[11px] text-gray-500">{{ p.barcode or 'No barcode' }}</p></div>
+                  <div class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200/50 dark:border-gray-800 shadow-sm p-0.5" style="background: {{ p.category_color }}15; color: {{ p.category_color }}">
+                    {% if p.image_url %}
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <span class="hidden">{{ p.name[:2] | upper }}</span>
+                    {% else %}
+                    <span>{{ p.name[:2] | upper }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="min-w-0"><p class="font-semibold truncate text-gray-900 dark:text-gray-100">{{ p.name }}</p><p class="text-[11px] text-gray-500 font-mono">{{ p.barcode or 'No barcode' }}</p></div>
                 </div>
               </td>
               <td class="px-4 py-3 font-mono text-xs">{{ p.sku }}</td>
@@ -163,74 +170,88 @@
 </div>
 
 <script>
-function setTab(tab) {
-  ['products', 'categories'].forEach(t => {
-    document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
-    const tabBtn = document.getElementById('tab-' + t);
-    if (t === tab) {
-      tabBtn.classList.add('border-primary-500', 'text-primary-600');
-      tabBtn.classList.remove('border-transparent', 'text-gray-500');
-    } else {
-      tabBtn.classList.remove('border-primary-500', 'text-primary-600');
-      tabBtn.classList.add('border-transparent', 'text-gray-500');
-    }
-  });
-}
-
-function filterProducts() {
-  const q = (document.getElementById('productSearch').value || '').toLowerCase();
-  const cat = document.getElementById('categoryFilter').value;
-  document.querySelectorAll('#productTableBody tr').forEach(row => {
-    const name = (row.dataset.productName || '');
-    const sku = (row.dataset.productSku || '');
-    const barcode = (row.dataset.productBarcode || '');
-    const matchesSearch = !q || name.includes(q) || sku.includes(q) || barcode.includes(q);
-    const matchesCat = cat === 'all' || row.dataset.productCat === cat;
-    row.style.display = (matchesSearch && matchesCat) ? '' : 'none';
-  });
-}
-
-function openProductModal(product) {
-  const form = document.getElementById('productForm');
-  if (product) {
-    document.getElementById('productModalTitle').textContent = 'Edit Product';
-    form.action = '/products/' + product.id + '/edit';
-    document.getElementById('f_name').value = product.name;
-    document.getElementById('f_sku').value = product.sku;
-    document.getElementById('f_barcode').value = product.barcode || '';
-    document.getElementById('f_category').value = product.category_id;
-    document.getElementById('f_unit').value = product.unit;
-    document.getElementById('f_price').value = product.price;
-    document.getElementById('f_cost').value = product.cost;
-    document.getElementById('f_stock').value = product.stock;
-    document.getElementById('f_low').value = product.low_stock_threshold;
-    document.getElementById('f_desc').value = product.description || '';
-    document.getElementById('f_active').checked = !!product.is_active;
-  } else {
-    document.getElementById('productModalTitle').textContent = 'Add New Product';
-    form.action = '/products/new';
-    form.reset();
-    document.getElementById('f_unit').value = 'pcs';
-    document.getElementById('f_low').value = '10';
-    document.getElementById('f_active').checked = true;
+(function () {
+  function setTab(tab) {
+    ['products', 'categories'].forEach(t => {
+      const panel = document.getElementById('panel-' + t);
+      if (panel) panel.classList.toggle('hidden', t !== tab);
+      const tabBtn = document.getElementById('tab-' + t);
+      if (tabBtn) {
+        if (t === tab) {
+          tabBtn.classList.add('border-primary-500', 'text-primary-600');
+          tabBtn.classList.remove('border-transparent', 'text-gray-500');
+        } else {
+          tabBtn.classList.remove('border-primary-500', 'text-primary-600');
+          tabBtn.classList.add('border-transparent', 'text-gray-500');
+        }
+      }
+    });
   }
-  document.getElementById('productModal').classList.remove('hidden');
-  document.getElementById('productModal').classList.add('flex');
-  if (window.lucide) lucide.createIcons();
-}
 
-function closeProductModal() {
-  document.getElementById('productModal').classList.add('hidden');
-  document.getElementById('productModal').classList.remove('flex');
-}
+  function filterProducts() {
+    const q = (document.getElementById('productSearch')?.value || '').toLowerCase();
+    const cat = document.getElementById('categoryFilter')?.value || 'all';
+    document.querySelectorAll('#productTableBody tr').forEach(row => {
+      const name = (row.dataset.productName || '');
+      const sku = (row.dataset.productSku || '');
+      const barcode = (row.dataset.productBarcode || '');
+      const matchesSearch = !q || name.includes(q) || sku.includes(q) || barcode.includes(q);
+      const matchesCat = cat === 'all' || row.dataset.productCat === cat;
+      row.style.display = (matchesSearch && matchesCat) ? '' : 'none';
+    });
+  }
 
-// Color radio styling
-document.querySelectorAll('.color-radio').forEach(radio => {
-  if (radio.checked) radio.parentElement.querySelector('span').classList.add('border-gray-900');
-  radio.addEventListener('change', () => {
-    document.querySelectorAll('.color-radio').forEach(r => r.parentElement.querySelector('span').classList.remove('border-gray-900'));
-    radio.parentElement.querySelector('span').classList.add('border-gray-900');
+  function openProductModal(product) {
+    const form = document.getElementById('productForm');
+    if (!form) return;
+    if (product) {
+      document.getElementById('productModalTitle').textContent = 'Edit Product';
+      form.action = '/products/' + product.id + '/edit';
+      document.getElementById('f_name').value = product.name;
+      document.getElementById('f_sku').value = product.sku;
+      document.getElementById('f_barcode').value = product.barcode || '';
+      document.getElementById('f_category').value = product.category_id;
+      document.getElementById('f_unit').value = product.unit;
+      document.getElementById('f_price').value = product.price;
+      document.getElementById('f_cost').value = product.cost;
+      document.getElementById('f_stock').value = product.stock;
+      document.getElementById('f_low').value = product.low_stock_threshold;
+      document.getElementById('f_desc').value = product.description || '';
+      document.getElementById('f_active').checked = !!product.is_active;
+    } else {
+      document.getElementById('productModalTitle').textContent = 'Add New Product';
+      form.action = '/products/new';
+      form.reset();
+      document.getElementById('f_unit').value = 'pcs';
+      document.getElementById('f_low').value = '10';
+      document.getElementById('f_active').checked = true;
+    }
+    document.getElementById('productModal').classList.remove('hidden');
+    document.getElementById('productModal').classList.add('flex');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  // Color radio styling
+  document.querySelectorAll('.color-radio').forEach(radio => {
+    if (radio.checked) radio.parentElement.querySelector('span')?.classList.add('border-gray-900');
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.color-radio').forEach(r => r.parentElement.querySelector('span')?.classList.remove('border-gray-900'));
+      radio.parentElement.querySelector('span')?.classList.add('border-gray-900');
+    });
   });
-});
+
+  window.setTab = setTab;
+  window.filterProducts = filterProducts;
+  window.openProductModal = openProductModal;
+  window.closeProductModal = closeProductModal;
+})();
 </script>
 {% endblock %}
