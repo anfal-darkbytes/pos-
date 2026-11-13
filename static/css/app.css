@@ -276,5 +276,16 @@ input[type="number"] {
   background-color: rgba(16, 185, 129, 0.12) !important;
 }
 
+/* ── Kiosk / Fullscreen POS Terminal Experience ─────────── */
+html.app-kiosk-fullscreen,
+html.app-kiosk-fullscreen body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+}
+
+
 
 

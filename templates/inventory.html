@@ -69,7 +69,7 @@
           <tr data-product-name="{{ p.name | lower }}" data-product-sku="{{ p.sku | lower }}" data-product-cat="{{ p.category_id }}" data-stock-status="{% if is_out %}out{% elif is_low %}low{% elif is_over %}overstock{% else %}healthy{% endif %}">
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200/50 dark:border-gray-800 shadow-sm p-0.5" style="background: {{ p.category_color }}15; color: {{ p.category_color }}">
+                <div class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 shadow-xs">
                   {% if p.image_url %}
                   <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                   <span class="hidden">{{ p.name[:2] | upper }}</span>
@@ -80,7 +80,7 @@
                 <div class="min-w-0"><p class="font-semibold text-sm truncate text-gray-900 dark:text-gray-100">{{ p.name }}</p><p class="text-[11px] text-gray-500 font-mono">{{ p.sku }}</p></div>
               </div>
             </td>
-            <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] border" style="color: {{ p.category_color }}; border-color: {{ p.category_color }}55">{{ p.category_name }}</span></td>
+            <td class="px-4 py-3"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80">{{ p.category_name }}</span></td>
             <td class="px-4 py-3 text-center"><span class="text-base font-bold tabular-nums {% if is_out %}text-red-600{% elif is_low %}text-amber-600{% endif %}">{{ p.stock }}</span><span class="text-[11px] text-gray-500 ml-1">{{ p.unit }}</span></td>
             <td class="px-4 py-3 text-center text-gray-500 tabular-nums text-sm">{{ p.low_stock_threshold }}</td>
             <td class="px-4 py-3"><div class="w-24 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden"><div class="h-full rounded-full {% if is_out %}bg-red-500{% elif is_low %}bg-amber-500{% else %}bg-primary-500{% endif %}" style="width: {{ stock_pct }}%"></div></div></td>
@@ -153,7 +153,7 @@
         datasets: [{
           label: 'Inventory Value',
           data: catDist.map(c => c.value),
-          backgroundColor: catDist.map(c => c.color),
+          backgroundColor: '#10b981',
           borderRadius: 4,
         }],
       },

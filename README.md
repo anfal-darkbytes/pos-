@@ -51,9 +51,9 @@ quickpos-python/
 │   │   ├── views.py                   # Real-time dashboard KPIs, hourly trends, report charts
 │   │   └── urls.py
 │   │
-│   └── core/                          # System configuration, database backups, initialization
-│       ├── models.py                  # StoreSettings (currency, tax, SMTP, Google Drive)
-│       ├── views.py                   # Store settings, database snapshots, cloud backup
+│   └── core/                          # System configuration, store settings, initialization
+│       ├── models.py                  # StoreSettings (currency, tax, store info)
+│       ├── views.py                   # Store settings, payment accounts, PWA endpoints
 │       ├── utils.py                   # POS template renderer, decorators, CSV utilities
 │       └── management/commands/
 │           └── init_quickpos.py       # Clean database initialization command
@@ -68,8 +68,7 @@ quickpos-python/
 │   ├── invoices.html                  # Invoice listing & receipt export
 │   ├── customers.html                 # CRM & loyalty points
 │   ├── reports.html                   # Financial performance charts
-│   ├── settings.html                  # Store configuration & integrations
-│   └── backup.html                    # Local & Google Drive backup manager
+│   └── settings.html                  # Store configuration & payment accounts
 │
 └── static/                            # Static assets
     ├── css/app.css                    # Custom styles, animations, scrollbars
@@ -86,7 +85,6 @@ quickpos-python/
 - **Customer Loyalty Engine**: Automatic tier upgrades (`Bronze` → `Silver` → `Gold` → `Platinum`) based on purchase volume.
 - **Real-Time Analytics**: Visual sales trends, top-selling items, category mix, and payment distribution powered by Chart.js.
 - **Progressive Web App (PWA)**: Installable as a native desktop/mobile application with offline caching and background synchronization.
-- **Automated Snapshots & Cloud Backup**: One-click local database snapshotting and optional Google Drive synchronization.
 - **Clean Architecture**: Free of mock dummy transactions and bloated test records.
 
 ---

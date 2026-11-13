@@ -1,2 +1,18 @@
-backups/credentials.json
-backups/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Local databases & media uploads
+*.sqlite3
+media/products/*
+!media/products/.gitkeep
+
+# Operating system files
+.DS_Store
+Thumbs.db

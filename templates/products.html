@@ -7,29 +7,55 @@
 <div class="p-6 space-y-5 pos-view-enter">
   <!-- Stats -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
-      <div class="grid place-items-center w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 shrink-0"><i data-lucide="package" class="w-5 h-5"></i></div>
-      <div><p class="text-xs text-gray-500">Total Products</p><p class="text-xl font-bold">{{ products | length }}</p></div>
+    <div
+      class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
+      <div
+        class="grid place-items-center w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 shrink-0">
+        <i data-lucide="package" class="w-5 h-5"></i></div>
+      <div>
+        <p class="text-xs text-gray-500">Total Products</p>
+        <p class="text-xl font-bold">{{ products | length }}</p>
+      </div>
     </div>
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
-      <div class="grid place-items-center w-10 h-10 rounded-lg bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 shrink-0"><i data-lucide="tag" class="w-5 h-5"></i></div>
-      <div><p class="text-xs text-gray-500">Categories</p><p class="text-xl font-bold">{{ categories | length }}</p></div>
+    <div
+      class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
+      <div
+        class="grid place-items-center w-10 h-10 rounded-lg bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 shrink-0">
+        <i data-lucide="tag" class="w-5 h-5"></i></div>
+      <div>
+        <p class="text-xs text-gray-500">Categories</p>
+        <p class="text-xl font-bold">{{ categories | length }}</p>
+      </div>
     </div>
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
-      <div class="grid place-items-center w-10 h-10 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 shrink-0"><i data-lucide="package" class="w-5 h-5"></i></div>
-      <div><p class="text-xs text-gray-500">Inventory Value</p><p class="text-xl font-bold">{{ total_value | money }}</p></div>
+    <div
+      class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
+      <div
+        class="grid place-items-center w-10 h-10 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 shrink-0">
+        <i data-lucide="package" class="w-5 h-5"></i></div>
+      <div>
+        <p class="text-xs text-gray-500">Inventory Value</p>
+        <p class="text-xl font-bold">{{ total_value | money }}</p>
+      </div>
     </div>
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
-      <div class="grid place-items-center w-10 h-10 rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 shrink-0"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
-      <div><p class="text-xs text-gray-500">Potential Profit</p><p class="text-xl font-bold">{{ potential_profit | money }}</p></div>
+    <div
+      class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center gap-3">
+      <div
+        class="grid place-items-center w-10 h-10 rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 shrink-0">
+        <i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+      <div>
+        <p class="text-xs text-gray-500">Potential Profit</p>
+        <p class="text-xl font-bold">{{ potential_profit | money }}</p>
+      </div>
     </div>
   </div>
 
   <!-- Tabs -->
   <div class="border-b border-gray-200 dark:border-gray-800">
     <nav class="flex gap-4">
-      <button onclick="setTab('products')" id="tab-products" class="py-2 px-1 text-sm font-medium border-b-2 border-primary-500 text-primary-600">Products</button>
-      <button onclick="setTab('categories')" id="tab-categories" class="py-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Categories</button>
+      <button onclick="setTab('products')" id="tab-products"
+        class="py-2 px-1 text-sm font-medium border-b-2 border-primary-500 text-primary-600">Products</button>
+      <button onclick="setTab('categories')" id="tab-categories"
+        class="py-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Categories</button>
     </nav>
   </div>
 
@@ -37,16 +63,22 @@
   <div id="panel-products" class="space-y-4">
     <div class="flex flex-wrap items-center gap-3">
       <div class="relative flex-1 min-w-64">
-        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+        <i data-lucide="search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
         <input id="productSearch" oninput="filterProducts()" placeholder="Search by name, SKU or barcode..."
           class="w-full pl-9 h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm focus:border-primary-500 focus:outline-none" />
       </div>
-      <select id="categoryFilter" onchange="filterProducts()" class="h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm">
+      <select id="categoryFilter" onchange="filterProducts()"
+        class="h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm">
         <option value="all">All Categories</option>
         {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
       </select>
-      <a href="?export=csv" target="_blank" class="flex items-center gap-1.5 h-9 px-3 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium"><i data-lucide="download" class="w-4 h-4"></i> Export CSV</a>
-      <button onclick="openProductModal()" class="flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i> Add Product</button>
+      <a href="?export=csv" target="_blank"
+        class="flex items-center gap-1.5 h-9 px-3 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium"><i
+          data-lucide="download" class="w-4 h-4"></i> Export CSV</a>
+      <button onclick="openProductModal()"
+        class="flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium"><i
+          data-lucide="plus" class="w-4 h-4"></i> Add Product</button>
     </div>
 
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
@@ -67,40 +99,59 @@
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="productTableBody">
             {% for p in products %}
-            <tr data-product-name="{{ p.name | lower }}" data-product-sku="{{ p.sku | lower }}" data-product-barcode="{{ (p.barcode or '') | lower }}" data-product-cat="{{ p.category_id }}" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+            <tr data-product-name="{{ p.name | lower }}" data-product-sku="{{ p.sku | lower }}"
+              data-product-barcode="{{ (p.barcode or '') | lower }}" data-product-cat="{{ p.category_id }}"
+              class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200/50 dark:border-gray-800 shadow-sm p-0.5" style="background: {{ p.category_color }}15; color: {{ p.category_color }}">
+                  <div
+                    class="w-10 h-10 rounded-xl overflow-hidden grid place-items-center text-xs font-bold shrink-0 border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 shadow-xs">
                     {% if p.image_url %}
-                    <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-full h-full object-contain"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="hidden">{{ p.name[:2] | upper }}</span>
                     {% else %}
                     <span>{{ p.name[:2] | upper }}</span>
                     {% endif %}
                   </div>
-                  <div class="min-w-0"><p class="font-semibold truncate text-gray-900 dark:text-gray-100">{{ p.name }}</p><p class="text-[11px] text-gray-500 font-mono">{{ p.barcode or 'No barcode' }}</p></div>
+                  <div class="min-w-0">
+                    <p class="font-semibold truncate text-gray-900 dark:text-gray-100">{{ p.name }}</p>
+                    <p class="text-[11px] text-gray-500 font-mono">{{ p.barcode or 'No barcode' }}</p>
+                  </div>
                 </div>
               </td>
               <td class="px-4 py-3 font-mono text-xs">{{ p.sku }}</td>
-              <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border" style="color: {{ p.category_color }}; border-color: {{ p.category_color }}55">{{ p.category_name }}</span></td>
+              <td class="px-4 py-3"><span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80">{{
+                  p.category_name }}</span></td>
               <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ p.price | money }}</td>
               <td class="px-4 py-3 text-right text-gray-500 tabular-nums">{{ p.cost | money }}</td>
-              <td class="px-4 py-3 text-right tabular-nums"><span class="{% if p.margin > 40 %}text-emerald-600 font-medium{% elif p.margin > 20 %}text-amber-600{% else %}text-red-600{% endif %}">{{ p.margin | round(0) | int }}%</span></td>
+              <td class="px-4 py-3 text-right tabular-nums"><span
+                  class="{% if p.margin > 40 %}text-emerald-600 font-medium{% elif p.margin > 20 %}text-amber-600{% else %}text-red-600{% endif %}">{{
+                  p.margin | round(0) | int }}%</span></td>
               <td class="px-4 py-3 text-right">
-                <button type="button" onclick='openStockModal({{ p | tojson }})'
-                  id="stock-btn-{{ p.id }}"
+                <button type="button" onclick='openStockModal({{ p | tojson }})' id="stock-btn-{{ p.id }}"
                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold tabular-nums cursor-pointer transition-all hover:scale-105 active:scale-95 border {% if p.is_low %}bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60 hover:bg-red-100{% else %}bg-gray-100 hover:bg-emerald-50 dark:bg-gray-800 dark:hover:bg-emerald-950/40 text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-300 border-gray-200 dark:border-gray-700{% endif %}"
                   title="Click to adjust stock">
                   <span id="stock-text-{{ p.id }}">{{ p.stock }} {{ p.unit }}</span>
                   <i data-lucide="boxes" class="w-3 h-3 opacity-60"></i>
                 </button>
               </td>
-              <td class="px-4 py-3 text-center"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium {% if p.is_active %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300{% else %}border border-gray-200 dark:border-gray-700 text-gray-500{% endif %}">{% if p.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+              <td class="px-4 py-3 text-center"><span
+                  class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium {% if p.is_active %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300{% else %}border border-gray-200 dark:border-gray-700 text-gray-500{% endif %}">{%
+                  if p.is_active %}Active{% else %}Inactive{% endif %}</span></td>
               <td class="px-4 py-3">
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick='openStockModal({{ p | tojson }})' class="grid place-items-center w-8 h-8 rounded hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 transition-colors cursor-pointer" title="Adjust Stock (Add/Remove/Set)"><i data-lucide="boxes" class="w-3.5 h-3.5"></i></button>
-                  <button type="button" onclick='openProductModal({{ p | tojson }})' class="grid place-items-center w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer" title="Edit Product"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-                  <form method="POST" action="/products/{{ p.id }}/delete" onsubmit="return confirm('Delete {{ p.name | e }}?')"><button type="submit" class="grid place-items-center w-8 h-8 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors cursor-pointer" title="Delete Product"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></form>
+                  <button type="button" onclick='openStockModal({{ p | tojson }})'
+                    class="grid place-items-center w-8 h-8 rounded hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 transition-colors cursor-pointer"
+                    title="Adjust Stock (Add/Remove/Set)"><i data-lucide="boxes" class="w-3.5 h-3.5"></i></button>
+                  <button type="button" onclick='openProductModal({{ p | tojson }})'
+                    class="grid place-items-center w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    title="Edit Product"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                  <form method="POST" action="/products/{{ p.id }}/delete"
+                    onsubmit="return confirm('Delete {{ p.name | e }}?')"><button type="submit"
+                      class="grid place-items-center w-8 h-8 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors cursor-pointer"
+                      title="Delete Product"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></form>
                 </div>
               </td>
             </tr>
@@ -116,30 +167,35 @@
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 space-y-4">
       <h3 class="font-semibold text-sm">New Category</h3>
       <form method="POST" action="/categories/new" class="space-y-3">
-        <div><label class="text-xs font-medium block mb-1">Name</label><input name="name" required class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm" placeholder="e.g. Frozen Foods" /></div>
-        <div>
-          <label class="text-xs font-medium block mb-1">Color</label>
-          <div class="flex flex-wrap gap-2">
-            {% set colors = ['#10b981', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7', '#ec4899', '#64748b'] %}
-            {% for c in colors %}
-            <label><input type="radio" name="color" value="{{ c }}" {% if c == '#10b981' %}checked{% endif %} class="hidden color-radio" /><span class="block w-7 h-7 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform" style="background: {{ c }}"></span></label>
-            {% endfor %}
-          </div>
-        </div>
-        <div><label class="text-xs font-medium block mb-1">Description</label><textarea name="description" rows="2" class="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm" placeholder="Optional"></textarea></div>
-        <button type="submit" class="w-full h-9 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i> Create Category</button>
+        <div><label class="text-xs font-medium block mb-1">Name</label><input name="name" required
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm"
+            placeholder="e.g. Frozen Foods" /></div>
+        <div><label class="text-xs font-medium block mb-1">Description</label><textarea name="description" rows="2"
+            class="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm"
+            placeholder="Optional"></textarea></div>
+        <button type="submit"
+          class="w-full h-9 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium flex items-center justify-center gap-1.5"><i
+            data-lucide="plus" class="w-4 h-4"></i> Create Category</button>
       </form>
     </div>
     <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
       <h3 class="font-semibold text-sm mb-3">Categories ({{ categories | length }})</h3>
       <div class="space-y-2">
         {% for c in categories %}
-        <div class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-          <div class="w-9 h-9 rounded-lg shrink-0" style="background: {{ c.color }}"></div>
-          <div class="flex-1 min-w-0"><p class="font-medium text-sm">{{ c.name }}</p><p class="text-[11px] text-gray-500 truncate">{{ c.description or 'No description' }}</p></div>
+        <div
+          class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+          <div
+            class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 grid place-items-center shrink-0 border border-gray-200 dark:border-gray-700/60">
+            <i data-lucide="tag" class="w-4 h-4"></i></div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-sm">{{ c.name }}</p>
+            <p class="text-[11px] text-gray-500 truncate">{{ c.description or 'No description' }}</p>
+          </div>
           <span class="text-[10px] bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{{ c.product_count }} products</span>
           {% if c.product_count == 0 %}
-          <form method="POST" action="/categories/{{ c.id }}/delete"><button type="submit" class="grid place-items-center w-8 h-8 rounded hover:bg-red-50 text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></form>
+          <form method="POST" action="/categories/{{ c.id }}/delete"><button type="submit"
+              class="grid place-items-center w-8 h-8 rounded hover:bg-red-50 text-red-600"><i data-lucide="trash-2"
+                class="w-3.5 h-3.5"></i></button></form>
           {% endif %}
         </div>
         {% endfor %}
@@ -150,15 +206,19 @@
 
 <!-- Product modal -->
 <div id="productModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 modal-overlay">
-  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto pos-scroll modal-content border border-gray-200 dark:border-gray-800">
+  <div
+    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto pos-scroll modal-content border border-gray-200 dark:border-gray-800">
     <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 grid place-items-center">
+        <div
+          class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 grid place-items-center">
           <i data-lucide="package" class="w-4 h-4"></i>
         </div>
         <h3 class="font-semibold text-lg text-gray-900 dark:text-white" id="productModalTitle">Add New Product</h3>
       </div>
-      <button type="button" onclick="closeProductModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <button type="button" onclick="closeProductModal()"
+        class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"><i data-lucide="x"
+          class="w-5 h-5"></i></button>
     </div>
 
     <form id="productForm" method="POST" action="/products/new" enctype="multipart/form-data" class="p-6 space-y-4">
@@ -168,31 +228,42 @@
       <!-- Image Upload & Live Preview Section -->
       <div>
         <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1.5">Product Image</label>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
-          <div class="relative w-20 h-20 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 grid place-items-center shrink-0 shadow-xs group">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
+          <div
+            class="relative w-20 h-20 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 grid place-items-center shrink-0 shadow-xs group">
             <img id="imagePreview" src="" alt="Preview" class="hidden w-full h-full object-contain p-1" />
-            <div id="imagePlaceholder" class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+            <div id="imagePlaceholder"
+              class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
               <i data-lucide="image-plus" class="w-7 h-7 mb-1 stroke-1"></i>
               <span class="text-[9px] uppercase tracking-wider font-semibold">No Image</span>
             </div>
-            <button type="button" id="removeImageBtn" onclick="clearSelectedImage()" class="hidden absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white grid place-items-center shadow-md hover:bg-red-600 transition-colors cursor-pointer" title="Remove image">
+            <button type="button" id="removeImageBtn" onclick="clearSelectedImage()"
+              class="hidden absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white grid place-items-center shadow-md hover:bg-red-600 transition-colors cursor-pointer"
+              title="Remove image">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
           </div>
           <div class="flex-1 space-y-2">
             <div class="flex flex-wrap items-center gap-2.5">
-              <label for="f_image" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-colors active:scale-95">
+              <label for="f_image"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-colors active:scale-95">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                 <span id="uploadBtnText">Upload Image</span>
               </label>
-              <input type="file" id="f_image" name="image" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="sr-only" onchange="handleImageFileSelected(this)" />
-              <button type="button" onclick="toggleImageUrlInput()" class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline cursor-pointer">
+              <input type="file" id="f_image" name="image" accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                class="sr-only" onchange="handleImageFileSelected(this)" />
+              <button type="button" onclick="toggleImageUrlInput()"
+                class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline cursor-pointer">
                 or image URL
               </button>
             </div>
-            <p class="text-[11px] text-gray-400 dark:text-gray-500">Supported formats: PNG, JPG, WebP, SVG (Max 5MB). Images display in catalog & POS register.</p>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500">Supported formats: PNG, JPG, WebP, SVG (Max 5MB).
+              Images display in catalog & POS register.</p>
             <div id="imageUrlContainer" class="hidden pt-1">
-              <input type="url" name="image_url" id="f_image_url" placeholder="https://example.com/images/item.png" oninput="handleImageUrlInput(this.value)" class="w-full h-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 text-xs text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none" />
+              <input type="url" name="image_url" id="f_image_url" placeholder="https://example.com/images/item.png"
+                oninput="handleImageUrlInput(this.value)"
+                class="w-full h-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 text-xs text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none" />
             </div>
           </div>
         </div>
@@ -200,47 +271,82 @@
 
       <div>
         <label class="text-xs font-medium block mb-1">Product Name *</label>
-        <input name="name" id="f_name" required placeholder="e.g. Organic Almond Milk" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" />
+        <input name="name" id="f_name" required placeholder="e.g. Organic Almond Milk"
+          class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="text-xs font-medium block mb-1">SKU *</label><input name="sku" id="f_sku" required placeholder="e.g. BEV-001" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono focus:border-primary-500 focus:outline-none" /></div>
-        <div><label class="text-xs font-medium block mb-1">Barcode</label><input name="barcode" id="f_barcode" placeholder="Scan or type barcode" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono focus:border-primary-500 focus:outline-none" /></div>
-        <div><label class="text-xs font-medium block mb-1">Category *</label><select name="category_id" id="f_category" required class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none">{% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
-        <div><label class="text-xs font-medium block mb-1">Unit</label><input name="unit" id="f_unit" placeholder="pcs, btl, kg, etc." class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" value="pcs" /></div>
-        <div><label class="text-xs font-medium block mb-1">Sell Price *</label><input name="price" id="f_price" type="number" step="0.01" min="0" required placeholder="0.00" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" /></div>
-        <div><label class="text-xs font-medium block mb-1">Cost Price</label><input name="cost" id="f_cost" type="number" step="0.01" min="0" placeholder="0.00" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" /></div>
+        <div><label class="text-xs font-medium block mb-1">SKU *</label><input name="sku" id="f_sku" required
+            placeholder="e.g. BEV-001"
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono focus:border-primary-500 focus:outline-none" />
+        </div>
+        <div><label class="text-xs font-medium block mb-1">Barcode</label><input name="barcode" id="f_barcode"
+            placeholder="Scan or type barcode"
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono focus:border-primary-500 focus:outline-none" />
+        </div>
+        <div><label class="text-xs font-medium block mb-1">Category *</label><select name="category_id" id="f_category"
+            required
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none">{%
+            for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div>
+        <div><label class="text-xs font-medium block mb-1">Unit</label><input name="unit" id="f_unit"
+            placeholder="pcs, btl, kg, etc."
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none"
+            value="pcs" /></div>
+        <div><label class="text-xs font-medium block mb-1">Sell Price *</label><input name="price" id="f_price"
+            type="number" step="0.01" min="0" required placeholder="0.00"
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" />
+        </div>
+        <div><label class="text-xs font-medium block mb-1">Cost Price</label><input name="cost" id="f_cost"
+            type="number" step="0.01" min="0" placeholder="0.00"
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" />
+        </div>
         <div>
-          <label class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 block mb-1 flex items-center justify-between">
+          <label
+            class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 block mb-1 flex items-center justify-between">
             <span>Stock Quantity</span>
             <span class="text-[10px] text-gray-400 font-normal">Available in store</span>
           </label>
-          <input name="stock" id="f_stock" type="number" min="0" class="w-full h-9 rounded-md border border-emerald-300 dark:border-emerald-700 bg-emerald-50/20 dark:bg-emerald-950/20 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none" value="0" />
+          <input name="stock" id="f_stock" type="number" min="0"
+            class="w-full h-9 rounded-md border border-emerald-300 dark:border-emerald-700 bg-emerald-50/20 dark:bg-emerald-950/20 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none"
+            value="0" />
         </div>
         <div>
           <label class="text-xs font-medium block mb-1 flex items-center justify-between">
             <span>Low Stock Alert</span>
             <span class="text-[10px] text-gray-400">Trigger threshold</span>
           </label>
-          <input name="low_stock_threshold" id="f_low" type="number" min="0" class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none" value="10" />
+          <input name="low_stock_threshold" id="f_low" type="number" min="0"
+            class="w-full h-9 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm focus:border-primary-500 focus:outline-none"
+            value="10" />
         </div>
       </div>
-      <div><label class="text-xs font-medium block mb-1">Description</label><textarea name="description" id="f_desc" rows="2" class="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none"></textarea></div>
-      <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" name="is_active" id="f_active" checked class="rounded text-primary-600 focus:ring-primary-500" /> <span class="font-medium text-gray-800 dark:text-gray-200">Product is active (available for sale on POS)</span></label>
+      <div><label class="text-xs font-medium block mb-1">Description</label><textarea name="description" id="f_desc"
+          rows="2"
+          class="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none"></textarea>
+      </div>
+      <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" name="is_active"
+          id="f_active" checked class="rounded text-primary-600 focus:ring-primary-500" /> <span
+          class="font-medium text-gray-800 dark:text-gray-200">Product is active (available for sale on
+          POS)</span></label>
     </form>
     <div class="flex gap-2 p-5 pt-0 border-t border-gray-100 dark:border-gray-800">
-      <button type="button" onclick="closeProductModal()" class="flex-1 h-10 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">Cancel</button>
-      <button type="button" onclick="document.getElementById('productForm').submit()" class="flex-1 h-10 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold cursor-pointer">Save Product</button>
+      <button type="button" onclick="closeProductModal()"
+        class="flex-1 h-10 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">Cancel</button>
+      <button type="button" onclick="document.getElementById('productForm').submit()"
+        class="flex-1 h-10 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold cursor-pointer">Save
+        Product</button>
     </div>
   </div>
 </div>
 
 <!-- Dedicated Quick Stock Adjustment Modal -->
 <div id="stockModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 modal-overlay">
-  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full modal-content border border-gray-200 dark:border-gray-800 overflow-hidden">
+  <div
+    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full modal-content border border-gray-200 dark:border-gray-800 overflow-hidden">
     <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 grid place-items-center">
+        <div
+          class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 grid place-items-center">
           <i data-lucide="boxes" class="w-5 h-5"></i>
         </div>
         <div>
@@ -248,7 +354,8 @@
           <p class="text-[11px] text-gray-500 font-mono" id="stockModalSubtitle">SKU: —</p>
         </div>
       </div>
-      <button type="button" onclick="closeStockModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer">
+      <button type="button" onclick="closeStockModal()"
+        class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
@@ -258,7 +365,8 @@
       <input type="hidden" name="next" value="/products" />
 
       <!-- Current Stock Status Card -->
-      <div class="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/80 dark:border-gray-700/80 space-y-2">
+      <div
+        class="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/80 dark:border-gray-700/80 space-y-2">
         <div class="flex justify-between items-center text-xs">
           <span class="text-gray-500 dark:text-gray-400 font-medium">Product</span>
           <span class="font-bold text-gray-900 dark:text-white truncate max-w-[200px]" id="stock_product_name">—</span>
@@ -274,16 +382,20 @@
         <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-1.5">Adjustment Type</label>
         <div class="grid grid-cols-3 gap-2">
           <label class="cursor-pointer">
-            <input type="radio" name="type" value="add" checked class="sr-only peer" onchange="onStockTypeChange('add')" />
-            <div class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-950/40 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+            <input type="radio" name="type" value="add" checked class="sr-only peer"
+              onchange="onStockTypeChange('add')" />
+            <div
+              class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-950/40 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
               <i data-lucide="plus-circle" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
               <span class="text-xs font-bold block">Add Stock</span>
               <span class="text-[9px] opacity-75">Restock</span>
             </div>
           </label>
           <label class="cursor-pointer">
-            <input type="radio" name="type" value="remove" class="sr-only peer" onchange="onStockTypeChange('remove')" />
-            <div class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-950/40 peer-checked:text-red-700 dark:peer-checked:text-red-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+            <input type="radio" name="type" value="remove" class="sr-only peer"
+              onchange="onStockTypeChange('remove')" />
+            <div
+              class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-950/40 peer-checked:text-red-700 dark:peer-checked:text-red-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
               <i data-lucide="minus-circle" class="w-4 h-4 mx-auto mb-1 text-red-500"></i>
               <span class="text-xs font-bold block">Remove</span>
               <span class="text-[9px] opacity-75">Damage/Loss</span>
@@ -291,7 +403,8 @@
           </label>
           <label class="cursor-pointer">
             <input type="radio" name="type" value="set" class="sr-only peer" onchange="onStockTypeChange('set')" />
-            <div class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-950/40 peer-checked:text-blue-700 dark:peer-checked:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+            <div
+              class="py-2.5 px-2 text-center rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-950/40 peer-checked:text-blue-700 dark:peer-checked:text-blue-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
               <i data-lucide="check-circle-2" class="w-4 h-4 mx-auto mb-1 text-blue-500"></i>
               <span class="text-xs font-bold block">Set Exact</span>
               <span class="text-[9px] opacity-75">Audit Count</span>
@@ -302,39 +415,53 @@
 
       <!-- Amount Input -->
       <div>
-        <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1" id="stockInputLabel">Quantity to Add (Restock)</label>
+        <label class="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1" id="stockInputLabel">Quantity
+          to Add (Restock)</label>
         <div class="relative">
-          <input type="number" name="amount" id="stock_amount" min="0" required placeholder="0" oninput="updateStockMath()"
+          <input type="number" name="amount" id="stock_amount" min="0" required placeholder="0"
+            oninput="updateStockMath()"
             class="w-full text-xl font-bold tabular-nums h-12 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 pr-12 text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none transition-all" />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 select-none" id="stockUnitLabel">pcs</span>
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 select-none"
+            id="stockUnitLabel">pcs</span>
         </div>
         <!-- Quick increment chip shortcuts -->
         <div class="flex flex-wrap gap-1.5 mt-2" id="stockQuickChips">
-          <button type="button" onclick="addStockQuickAmount(1)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+1</button>
-          <button type="button" onclick="addStockQuickAmount(5)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+5</button>
-          <button type="button" onclick="addStockQuickAmount(10)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+10</button>
-          <button type="button" onclick="addStockQuickAmount(25)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+25</button>
-          <button type="button" onclick="addStockQuickAmount(50)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+50</button>
-          <button type="button" onclick="addStockQuickAmount(100)" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+100</button>
+          <button type="button" onclick="addStockQuickAmount(1)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+1</button>
+          <button type="button" onclick="addStockQuickAmount(5)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+5</button>
+          <button type="button" onclick="addStockQuickAmount(10)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+10</button>
+          <button type="button" onclick="addStockQuickAmount(25)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+25</button>
+          <button type="button" onclick="addStockQuickAmount(50)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+50</button>
+          <button type="button" onclick="addStockQuickAmount(100)"
+            class="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer">+100</button>
         </div>
       </div>
 
       <!-- Live Calculation Banner -->
-      <div id="stockResultBanner" class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between text-xs">
+      <div id="stockResultBanner"
+        class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between text-xs">
         <span class="text-emerald-800 dark:text-emerald-300 font-medium">New Stock Level:</span>
-        <span class="font-extrabold text-sm tabular-nums text-emerald-900 dark:text-emerald-200" id="stockCalculatedQty">—</span>
+        <span class="font-extrabold text-sm tabular-nums text-emerald-900 dark:text-emerald-200"
+          id="stockCalculatedQty">—</span>
       </div>
 
       <!-- Reason note -->
       <div>
         <label class="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1">Reason / Note (Optional)</label>
-        <input type="text" name="reason" id="stock_reason" placeholder="e.g. Shipment received, supplier restock, shrinkage"
+        <input type="text" name="reason" id="stock_reason"
+          placeholder="e.g. Shipment received, supplier restock, shrinkage"
           class="w-full h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-xs text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none" />
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button type="button" onclick="closeStockModal()" class="flex-1 h-10 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">Cancel</button>
-        <button type="submit" id="stockSubmitBtn" class="flex-1 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5">
+        <button type="button" onclick="closeStockModal()"
+          class="flex-1 h-10 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">Cancel</button>
+        <button type="submit" id="stockSubmitBtn"
+          class="flex-1 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5">
           <i data-lucide="check" class="w-4 h-4"></i> Save Stock
         </button>
       </div>
@@ -343,319 +470,310 @@
 </div>
 
 <script>
-(function () {
-  function setTab(tab) {
-    ['products', 'categories'].forEach(t => {
-      const panel = document.getElementById('panel-' + t);
-      if (panel) panel.classList.toggle('hidden', t !== tab);
-      const tabBtn = document.getElementById('tab-' + t);
-      if (tabBtn) {
-        if (t === tab) {
-          tabBtn.classList.add('border-primary-500', 'text-primary-600');
-          tabBtn.classList.remove('border-transparent', 'text-gray-500');
-        } else {
-          tabBtn.classList.remove('border-primary-500', 'text-primary-600');
-          tabBtn.classList.add('border-transparent', 'text-gray-500');
+  (function () {
+    function setTab(tab) {
+      ['products', 'categories'].forEach(t => {
+        const panel = document.getElementById('panel-' + t);
+        if (panel) panel.classList.toggle('hidden', t !== tab);
+        const tabBtn = document.getElementById('tab-' + t);
+        if (tabBtn) {
+          if (t === tab) {
+            tabBtn.classList.add('border-primary-500', 'text-primary-600');
+            tabBtn.classList.remove('border-transparent', 'text-gray-500');
+          } else {
+            tabBtn.classList.remove('border-primary-500', 'text-primary-600');
+            tabBtn.classList.add('border-transparent', 'text-gray-500');
+          }
         }
-      }
-    });
-  }
-
-  function filterProducts() {
-    const q = (document.getElementById('productSearch')?.value || '').toLowerCase();
-    const cat = document.getElementById('categoryFilter')?.value || 'all';
-    document.querySelectorAll('#productTableBody tr').forEach(row => {
-      const name = (row.dataset.productName || '');
-      const sku = (row.dataset.productSku || '');
-      const barcode = (row.dataset.productBarcode || '');
-      const matchesSearch = !q || name.includes(q) || sku.includes(q) || barcode.includes(q);
-      const matchesCat = cat === 'all' || row.dataset.productCat === cat;
-      row.style.display = (matchesSearch && matchesCat) ? '' : 'none';
-    });
-  }
-
-  function handleImageFileSelected(input) {
-    const file = input.files && input.files[0];
-    if (!file) return;
-    const preview = document.getElementById('imagePreview');
-    const placeholder = document.getElementById('imagePlaceholder');
-    const removeBtn = document.getElementById('removeImageBtn');
-    const removeInput = document.getElementById('f_remove_image');
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      if (preview) {
-        preview.src = e.target.result;
-        preview.classList.remove('hidden');
-      }
-      if (placeholder) placeholder.classList.add('hidden');
-      if (removeBtn) removeBtn.classList.remove('hidden');
-      if (removeInput) removeInput.value = '0';
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function clearSelectedImage() {
-    const fileInput = document.getElementById('f_image');
-    if (fileInput) fileInput.value = '';
-    const preview = document.getElementById('imagePreview');
-    if (preview) {
-      preview.src = '';
-      preview.classList.add('hidden');
+      });
     }
-    const placeholder = document.getElementById('imagePlaceholder');
-    if (placeholder) placeholder.classList.remove('hidden');
-    const removeBtn = document.getElementById('removeImageBtn');
-    if (removeBtn) removeBtn.classList.add('hidden');
-    const removeInput = document.getElementById('f_remove_image');
-    if (removeInput) removeInput.value = '1';
-    const urlInput = document.getElementById('f_image_url');
-    if (urlInput) urlInput.value = '';
-  }
 
-  function toggleImageUrlInput() {
-    const container = document.getElementById('imageUrlContainer');
-    if (container) container.classList.toggle('hidden');
-  }
-
-  function handleImageUrlInput(url) {
-    const preview = document.getElementById('imagePreview');
-    const placeholder = document.getElementById('imagePlaceholder');
-    const removeBtn = document.getElementById('removeImageBtn');
-    const removeInput = document.getElementById('f_remove_image');
-    if (url && url.trim()) {
-      if (preview) {
-        preview.src = url.trim();
-        preview.classList.remove('hidden');
-      }
-      if (placeholder) placeholder.classList.add('hidden');
-      if (removeBtn) removeBtn.classList.remove('hidden');
-      if (removeInput) removeInput.value = '0';
+    function filterProducts() {
+      const q = (document.getElementById('productSearch')?.value || '').toLowerCase();
+      const cat = document.getElementById('categoryFilter')?.value || 'all';
+      document.querySelectorAll('#productTableBody tr').forEach(row => {
+        const name = (row.dataset.productName || '');
+        const sku = (row.dataset.productSku || '');
+        const barcode = (row.dataset.productBarcode || '');
+        const matchesSearch = !q || name.includes(q) || sku.includes(q) || barcode.includes(q);
+        const matchesCat = cat === 'all' || row.dataset.productCat === cat;
+        row.style.display = (matchesSearch && matchesCat) ? '' : 'none';
+      });
     }
-  }
 
-  function openProductModal(product) {
-    const form = document.getElementById('productForm');
-    if (!form) return;
-    clearSelectedImage();
-    if (product) {
-      document.getElementById('productModalTitle').textContent = 'Edit Product';
-      form.action = '/products/' + product.id + '/edit';
-      document.getElementById('f_id').value = product.id;
-      document.getElementById('f_name').value = product.name;
-      document.getElementById('f_sku').value = product.sku;
-      document.getElementById('f_barcode').value = product.barcode || '';
-      document.getElementById('f_category').value = product.category_id;
-      document.getElementById('f_unit').value = product.unit;
-      document.getElementById('f_price').value = product.price;
-      document.getElementById('f_cost').value = product.cost;
-      document.getElementById('f_stock').value = product.stock;
-      document.getElementById('f_low').value = product.low_stock_threshold;
-      document.getElementById('f_desc').value = product.description || '';
-      document.getElementById('f_active').checked = !!product.is_active;
+    function handleImageFileSelected(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const preview = document.getElementById('imagePreview');
+      const placeholder = document.getElementById('imagePlaceholder');
+      const removeBtn = document.getElementById('removeImageBtn');
+      const removeInput = document.getElementById('f_remove_image');
 
-      if (product.image_url) {
-        const preview = document.getElementById('imagePreview');
-        const placeholder = document.getElementById('imagePlaceholder');
-        const removeBtn = document.getElementById('removeImageBtn');
-        const urlInput = document.getElementById('f_image_url');
+      const reader = new FileReader();
+      reader.onload = function (e) {
         if (preview) {
-          preview.src = product.image_url;
+          preview.src = e.target.result;
           preview.classList.remove('hidden');
         }
         if (placeholder) placeholder.classList.add('hidden');
         if (removeBtn) removeBtn.classList.remove('hidden');
-        if (urlInput) urlInput.value = product.image_url;
+        if (removeInput) removeInput.value = '0';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearSelectedImage() {
+      const fileInput = document.getElementById('f_image');
+      if (fileInput) fileInput.value = '';
+      const preview = document.getElementById('imagePreview');
+      if (preview) {
+        preview.src = '';
+        preview.classList.add('hidden');
       }
-    } else {
-      document.getElementById('productModalTitle').textContent = 'Add New Product';
-      form.action = '/products/new';
-      form.reset();
-      document.getElementById('f_id').value = '';
-      document.getElementById('f_unit').value = 'pcs';
-      document.getElementById('f_low').value = '10';
-      document.getElementById('f_active').checked = true;
+      const placeholder = document.getElementById('imagePlaceholder');
+      if (placeholder) placeholder.classList.remove('hidden');
+      const removeBtn = document.getElementById('removeImageBtn');
+      if (removeBtn) removeBtn.classList.add('hidden');
+      const removeInput = document.getElementById('f_remove_image');
+      if (removeInput) removeInput.value = '1';
+      const urlInput = document.getElementById('f_image_url');
+      if (urlInput) urlInput.value = '';
+    }
+
+    function toggleImageUrlInput() {
+      const container = document.getElementById('imageUrlContainer');
+      if (container) container.classList.toggle('hidden');
+    }
+
+    function handleImageUrlInput(url) {
+      const preview = document.getElementById('imagePreview');
+      const placeholder = document.getElementById('imagePlaceholder');
+      const removeBtn = document.getElementById('removeImageBtn');
+      const removeInput = document.getElementById('f_remove_image');
+      if (url && url.trim()) {
+        if (preview) {
+          preview.src = url.trim();
+          preview.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (removeBtn) removeBtn.classList.remove('hidden');
+        if (removeInput) removeInput.value = '0';
+      }
+    }
+
+    function openProductModal(product) {
+      const form = document.getElementById('productForm');
+      if (!form) return;
       clearSelectedImage();
-    }
-    document.getElementById('productModal').classList.remove('hidden');
-    document.getElementById('productModal').classList.add('flex');
-    if (window.lucide) lucide.createIcons();
-  }
+      if (product) {
+        document.getElementById('productModalTitle').textContent = 'Edit Product';
+        form.action = '/products/' + product.id + '/edit';
+        document.getElementById('f_id').value = product.id;
+        document.getElementById('f_name').value = product.name;
+        document.getElementById('f_sku').value = product.sku;
+        document.getElementById('f_barcode').value = product.barcode || '';
+        document.getElementById('f_category').value = product.category_id;
+        document.getElementById('f_unit').value = product.unit;
+        document.getElementById('f_price').value = product.price;
+        document.getElementById('f_cost').value = product.cost;
+        document.getElementById('f_stock').value = product.stock;
+        document.getElementById('f_low').value = product.low_stock_threshold;
+        document.getElementById('f_desc').value = product.description || '';
+        document.getElementById('f_active').checked = !!product.is_active;
 
-  function closeProductModal() {
-    const modal = document.getElementById('productModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-  }
-
-  // ── Stock Adjustment Logic ─────────────────────────────────────────
-  let currentStockProduct = null;
-
-  function openStockModal(product) {
-    currentStockProduct = product;
-    const modal = document.getElementById('stockModal');
-    if (!modal) return;
-    document.getElementById('stock_product_id').value = product.id;
-    document.getElementById('stockModalSubtitle').textContent = 'SKU: ' + product.sku;
-    document.getElementById('stock_product_name').textContent = product.name;
-    document.getElementById('stock_current_qty').textContent = `${product.stock} ${product.unit}`;
-    document.getElementById('stockUnitLabel').textContent = product.unit;
-    document.getElementById('stock_amount').value = '10';
-    document.getElementById('stock_reason').value = '';
-
-    // Set default mode to 'add'
-    const addRadio = document.querySelector('input[name="type"][value="add"]');
-    if (addRadio) addRadio.checked = true;
-    onStockTypeChange('add');
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    if (window.lucide) lucide.createIcons();
-  }
-
-  function closeStockModal() {
-    const modal = document.getElementById('stockModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-    currentStockProduct = null;
-  }
-
-  function onStockTypeChange(type) {
-    const label = document.getElementById('stockInputLabel');
-    if (type === 'add') {
-      if (label) label.textContent = 'Quantity to Add (Restock)';
-    } else if (type === 'remove') {
-      if (label) label.textContent = 'Quantity to Remove (Damage/Loss)';
-    } else {
-      if (label) label.textContent = 'New Exact Count (Audit Count)';
-    }
-    updateStockMath();
-  }
-
-  function updateStockMath() {
-    if (!currentStockProduct) return;
-    const current = parseInt(currentStockProduct.stock) || 0;
-    const amount = parseInt(document.getElementById('stock_amount')?.value || 0) || 0;
-    const type = document.querySelector('input[name="type"]:checked')?.value || 'add';
-    let next = current;
-    let diffStr = '';
-
-    if (type === 'add') {
-      next = current + amount;
-      diffStr = `(+${amount} ${currentStockProduct.unit})`;
-    } else if (type === 'remove') {
-      next = Math.max(0, current - amount);
-      diffStr = `(-${amount} ${currentStockProduct.unit})`;
-    } else {
-      next = amount;
-      const diff = next - current;
-      diffStr = `(${diff >= 0 ? '+' : ''}${diff} ${currentStockProduct.unit})`;
-    }
-
-    const banner = document.getElementById('stockCalculatedQty');
-    if (banner) {
-      banner.textContent = `${next} ${currentStockProduct.unit} ${diffStr}`;
-    }
-  }
-
-  function addStockQuickAmount(n) {
-    const input = document.getElementById('stock_amount');
-    if (!input) return;
-    const current = parseInt(input.value) || 0;
-    input.value = current + n;
-    updateStockMath();
-  }
-
-  async function handleStockSubmit(e) {
-    e.preventDefault();
-    if (!currentStockProduct) return;
-    const form = document.getElementById('stockForm');
-    const btn = document.getElementById('stockSubmitBtn');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...';
-    }
-
-    const formData = new FormData(form);
-    try {
-      const res = await fetch(`/inventory/${currentStockProduct.id}/adjust`, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        currentStockProduct.stock = data.new_stock;
-
-        // Update table row stock badge text
-        const badgeSpan = document.getElementById('stock-text-' + data.product_id);
-        if (badgeSpan) {
-          badgeSpan.textContent = `${data.new_stock} ${data.unit}`;
-        }
-        const badgeBtn = document.getElementById('stock-btn-' + data.product_id);
-        if (badgeBtn) {
-          if (data.is_low) {
-            badgeBtn.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold tabular-nums cursor-pointer transition-all hover:scale-105 active:scale-95 border bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60 hover:bg-red-100";
-          } else {
-            badgeBtn.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold tabular-nums cursor-pointer transition-all hover:scale-105 active:scale-95 border bg-gray-100 hover:bg-emerald-50 dark:bg-gray-800 dark:hover:bg-emerald-950/40 text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-300 border-gray-200 dark:border-gray-700";
+        if (product.image_url) {
+          const preview = document.getElementById('imagePreview');
+          const placeholder = document.getElementById('imagePlaceholder');
+          const removeBtn = document.getElementById('removeImageBtn');
+          const urlInput = document.getElementById('f_image_url');
+          if (preview) {
+            preview.src = product.image_url;
+            preview.classList.remove('hidden');
           }
+          if (placeholder) placeholder.classList.add('hidden');
+          if (removeBtn) removeBtn.classList.remove('hidden');
+          if (urlInput) urlInput.value = product.image_url;
         }
-
-        if (window.showToast) {
-          window.showToast(data.message || 'Stock updated successfully', 'success');
-        } else {
-          // Fallback toast
-          const toast = document.createElement('div');
-          toast.className = 'fixed bottom-4 right-4 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-bounce';
-          toast.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> ${data.message}`;
-          document.body.appendChild(toast);
-          if (window.lucide) lucide.createIcons();
-          setTimeout(() => toast.remove(), 3000);
-        }
-        closeStockModal();
       } else {
-        alert(data.error || 'Failed to update stock');
+        document.getElementById('productModalTitle').textContent = 'Add New Product';
+        form.action = '/products/new';
+        form.reset();
+        document.getElementById('f_id').value = '';
+        document.getElementById('f_unit').value = 'pcs';
+        document.getElementById('f_low').value = '10';
+        document.getElementById('f_active').checked = true;
+        clearSelectedImage();
       }
-    } catch (err) {
-      console.warn('[Stock AJAX error, falling back to form submit]', err);
-      form.submit();
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save Stock';
-        if (window.lucide) lucide.createIcons();
+      document.getElementById('productModal').classList.remove('hidden');
+      document.getElementById('productModal').classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeProductModal() {
+      const modal = document.getElementById('productModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
       }
     }
-  }
 
-  // Color radio styling
-  document.querySelectorAll('.color-radio').forEach(radio => {
-    if (radio.checked) radio.parentElement.querySelector('span')?.classList.add('border-gray-900');
-    radio.addEventListener('change', () => {
-      document.querySelectorAll('.color-radio').forEach(r => r.parentElement.querySelector('span')?.classList.remove('border-gray-900'));
-      radio.parentElement.querySelector('span')?.classList.add('border-gray-900');
-    });
-  });
+    // ── Stock Adjustment Logic ─────────────────────────────────────────
+    let currentStockProduct = null;
 
-  window.setTab = setTab;
-  window.filterProducts = filterProducts;
-  window.openProductModal = openProductModal;
-  window.closeProductModal = closeProductModal;
-  window.handleImageFileSelected = handleImageFileSelected;
-  window.clearSelectedImage = clearSelectedImage;
-  window.toggleImageUrlInput = toggleImageUrlInput;
-  window.handleImageUrlInput = handleImageUrlInput;
-  window.openStockModal = openStockModal;
-  window.closeStockModal = closeStockModal;
-  window.onStockTypeChange = onStockTypeChange;
-  window.updateStockMath = updateStockMath;
-  window.addStockQuickAmount = addStockQuickAmount;
-  window.handleStockSubmit = handleStockSubmit;
-})();
+    function openStockModal(product) {
+      currentStockProduct = product;
+      const modal = document.getElementById('stockModal');
+      if (!modal) return;
+      document.getElementById('stock_product_id').value = product.id;
+      document.getElementById('stockModalSubtitle').textContent = 'SKU: ' + product.sku;
+      document.getElementById('stock_product_name').textContent = product.name;
+      document.getElementById('stock_current_qty').textContent = `${product.stock} ${product.unit}`;
+      document.getElementById('stockUnitLabel').textContent = product.unit;
+      document.getElementById('stock_amount').value = '10';
+      document.getElementById('stock_reason').value = '';
+
+      // Set default mode to 'add'
+      const addRadio = document.querySelector('input[name="type"][value="add"]');
+      if (addRadio) addRadio.checked = true;
+      onStockTypeChange('add');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeStockModal() {
+      const modal = document.getElementById('stockModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      currentStockProduct = null;
+    }
+
+    function onStockTypeChange(type) {
+      const label = document.getElementById('stockInputLabel');
+      if (type === 'add') {
+        if (label) label.textContent = 'Quantity to Add (Restock)';
+      } else if (type === 'remove') {
+        if (label) label.textContent = 'Quantity to Remove (Damage/Loss)';
+      } else {
+        if (label) label.textContent = 'New Exact Count (Audit Count)';
+      }
+      updateStockMath();
+    }
+
+    function updateStockMath() {
+      if (!currentStockProduct) return;
+      const current = parseInt(currentStockProduct.stock) || 0;
+      const amount = parseInt(document.getElementById('stock_amount')?.value || 0) || 0;
+      const type = document.querySelector('input[name="type"]:checked')?.value || 'add';
+      let next = current;
+      let diffStr = '';
+
+      if (type === 'add') {
+        next = current + amount;
+        diffStr = `(+${amount} ${currentStockProduct.unit})`;
+      } else if (type === 'remove') {
+        next = Math.max(0, current - amount);
+        diffStr = `(-${amount} ${currentStockProduct.unit})`;
+      } else {
+        next = amount;
+        const diff = next - current;
+        diffStr = `(${diff >= 0 ? '+' : ''}${diff} ${currentStockProduct.unit})`;
+      }
+
+      const banner = document.getElementById('stockCalculatedQty');
+      if (banner) {
+        banner.textContent = `${next} ${currentStockProduct.unit} ${diffStr}`;
+      }
+    }
+
+    function addStockQuickAmount(n) {
+      const input = document.getElementById('stock_amount');
+      if (!input) return;
+      const current = parseInt(input.value) || 0;
+      input.value = current + n;
+      updateStockMath();
+    }
+
+    async function handleStockSubmit(e) {
+      e.preventDefault();
+      if (!currentStockProduct) return;
+      const form = document.getElementById('stockForm');
+      const btn = document.getElementById('stockSubmitBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...';
+      }
+
+      const formData = new FormData(form);
+      try {
+        const res = await fetch(`/inventory/${currentStockProduct.id}/adjust`, {
+          method: 'POST',
+          body: formData,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          currentStockProduct.stock = data.new_stock;
+
+          // Update table row stock badge text
+          const badgeSpan = document.getElementById('stock-text-' + data.product_id);
+          if (badgeSpan) {
+            badgeSpan.textContent = `${data.new_stock} ${data.unit}`;
+          }
+          const badgeBtn = document.getElementById('stock-btn-' + data.product_id);
+          if (badgeBtn) {
+            if (data.is_low) {
+              badgeBtn.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold tabular-nums cursor-pointer transition-all hover:scale-105 active:scale-95 border bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60 hover:bg-red-100";
+            } else {
+              badgeBtn.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold tabular-nums cursor-pointer transition-all hover:scale-105 active:scale-95 border bg-gray-100 hover:bg-emerald-50 dark:bg-gray-800 dark:hover:bg-emerald-950/40 text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-300 border-gray-200 dark:border-gray-700";
+            }
+          }
+
+          if (window.showToast) {
+            window.showToast(data.message || 'Stock updated successfully', 'success');
+          } else {
+            // Fallback toast
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-bounce';
+            toast.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> ${data.message}`;
+            document.body.appendChild(toast);
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => toast.remove(), 3000);
+          }
+          closeStockModal();
+        } else {
+          alert(data.error || 'Failed to update stock');
+        }
+      } catch (err) {
+        console.warn('[Stock AJAX error, falling back to form submit]', err);
+        form.submit();
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save Stock';
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    window.setTab = setTab;
+    window.filterProducts = filterProducts;
+    window.openProductModal = openProductModal;
+    window.closeProductModal = closeProductModal;
+    window.handleImageFileSelected = handleImageFileSelected;
+    window.clearSelectedImage = clearSelectedImage;
+    window.toggleImageUrlInput = toggleImageUrlInput;
+    window.handleImageUrlInput = handleImageUrlInput;
+    window.openStockModal = openStockModal;
+    window.closeStockModal = closeStockModal;
+    window.onStockTypeChange = onStockTypeChange;
+    window.updateStockMath = updateStockMath;
+    window.addStockQuickAmount = addStockQuickAmount;
+    window.handleStockSubmit = handleStockSubmit;
+  })();
 </script>
 {% endblock %}

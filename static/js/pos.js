@@ -81,7 +81,7 @@ window.addEventListener('pulsepos:catalog-updated', function (e) {
   }
 });
 
-function addToCart(productId, name, price, cost, stock) {
+function addToCart(productId, name, price, cost, stock, sku, imageUrl) {
   if (!productId) return;
   cart = window.posCart || [];
   price = parseFloat(price) || 0;
@@ -95,12 +95,23 @@ function addToCart(productId, name, price, cost, stock) {
       return;
     }
     existing.quantity += 1;
+    if (sku && !existing.sku) existing.sku = sku;
+    if (imageUrl && !existing.imageUrl) existing.imageUrl = imageUrl;
   } else {
     if (stock <= 0) {
       if (window.showToast) window.showToast('Item is out of stock', 'warning');
       return;
     }
-    cart.push({ productId: String(productId), name, price, cost, stock, quantity: 1 });
+    cart.push({
+      productId: String(productId),
+      name: name,
+      price: price,
+      cost: cost,
+      stock: stock,
+      quantity: 1,
+      sku: sku || '',
+      imageUrl: imageUrl || ''
+    });
   }
   window.posCart = cart;
   renderCart();
@@ -131,8 +142,11 @@ function handleProductClick(btn, event) {
   const cost = parseFloat(btn.dataset.productCost) || 0;
   const rawStock = btn.dataset.productStock;
   const stock = (rawStock !== undefined && rawStock !== null && rawStock !== '') ? (parseInt(rawStock) || 0) : 999;
+  const sku = btn.dataset.productSku || '';
+  const imgEl = btn.querySelector('img');
+  const imageUrl = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : '';
 
-  addToCart(id, name, price, cost, stock);
+  addToCart(id, name, price, cost, stock, sku, imageUrl);
 }
 
 function removeFromCart(productId) {
@@ -457,14 +471,167 @@ function setCategory(catId) {
   });
 }
 
-// Checkout flow — dedicated checkout screen
+// ── Stage 1: Dedicated Order Summary Screen ─────────────────────────
+function openOrderSummary() {
+  if (cart.length === 0) return;
+  const sym = getCurrencySymbol();
+
+  const regView = document.getElementById('posRegisterView');
+  const osView = document.getElementById('posOrderSummaryView');
+  const coView = document.getElementById('posCheckoutView');
+
+  if (regView) regView.classList.add('hidden');
+  if (coView) {
+    coView.classList.add('hidden');
+    coView.classList.remove('flex');
+  }
+  if (osView) {
+    osView.classList.remove('hidden');
+    osView.classList.add('flex');
+  }
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const tax = Math.round(subtotal * window.taxRate / 100 * 100) / 100;
+  const discIn = document.getElementById('discountInput');
+  const discount = Math.max(0, parseFloat(discIn ? discIn.value : 0) || 0);
+  const total = Math.max(0, Math.round((subtotal + tax - discount) * 100) / 100);
+  const totalItems = cart.reduce((s, i) => s + i.quantity, 0);
+
+  // Financial summary on Order Summary screen
+  const osSub = document.getElementById('osSubtotal');
+  if (osSub) osSub.textContent = sym + subtotal.toFixed(2);
+  const osTax = document.getElementById('osTax');
+  if (osTax) osTax.textContent = sym + tax.toFixed(2);
+  const osDiscRow = document.getElementById('osDiscRow');
+  if (osDiscRow) {
+    if (discount > 0) {
+      osDiscRow.classList.remove('hidden');
+      const osDisc = document.getElementById('osDiscount');
+      if (osDisc) osDisc.textContent = '-' + sym + discount.toFixed(2);
+    } else {
+      osDiscRow.classList.add('hidden');
+    }
+  }
+  const osTotal = document.getElementById('osTotal');
+  if (osTotal) osTotal.textContent = sym + total.toFixed(2);
+  const osProceedBtn = document.getElementById('osProceedBtnAmount');
+  if (osProceedBtn) osProceedBtn.textContent = sym + total.toFixed(2);
+
+  const osItemCountBadge = document.getElementById('osItemCountBadge');
+  if (osItemCountBadge) osItemCountBadge.textContent = `${totalItems} unit${totalItems > 1 ? 's' : ''} (${cart.length} line${cart.length > 1 ? 's' : ''})`;
+
+  // Cashier & Customer info
+  const osCashierBadge = document.getElementById('osCashierBadge');
+  if (osCashierBadge) osCashierBadge.textContent = window.currentUserName || 'Cashier';
+
+  const customerObj = selectedCustomer ? (window.customers || []).find(c => c.id === selectedCustomer) : null;
+  const osCustName = document.getElementById('osCustomerName');
+  const osCustAvatar = document.getElementById('osCustomerAvatar');
+  const osCustCardName = document.getElementById('osCustomerCardName');
+  const osCustCardMeta = document.getElementById('osCustomerCardMeta');
+
+  if (customerObj) {
+    if (osCustName) osCustName.textContent = customerObj.name;
+    if (osCustAvatar) osCustAvatar.textContent = customerObj.name.charAt(0).toUpperCase();
+    if (osCustCardName) osCustCardName.textContent = customerObj.name;
+    if (osCustCardMeta) {
+      osCustCardMeta.innerHTML = `<span class="text-primary-600 dark:text-primary-400 font-bold">${customerObj.pts} pts</span> · ${customerObj.phone || 'No phone'} · <span class="text-emerald-600 dark:text-emerald-400 font-semibold">+${Math.floor(total)} pts will be earned</span>`;
+    }
+  } else {
+    if (osCustName) osCustName.textContent = 'Walk-in Customer';
+    if (osCustAvatar) osCustAvatar.textContent = 'W';
+    if (osCustCardName) osCustCardName.textContent = 'Walk-in Customer';
+    if (osCustCardMeta) osCustCardMeta.textContent = 'No loyalty profile attached';
+  }
+
+  // Populate itemized table in Order Summary
+  const osItemList = document.getElementById('osItemList');
+  if (osItemList) {
+    osItemList.innerHTML = cart.map(item => `
+      <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="py-3.5 px-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 flex items-center justify-center shrink-0 overflow-hidden font-bold text-xs text-gray-500 shadow-2xs">
+              ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-contain">` : `<span>${(item.name || 'P').substring(0, 2).toUpperCase()}</span>`}
+            </div>
+            <div class="min-w-0">
+              <p class="font-bold text-gray-900 dark:text-gray-100 text-xs truncate leading-snug">${item.name}</p>
+              <p class="text-[11px] text-gray-400 font-mono mt-0.5">${item.sku ? 'SKU: ' + item.sku : 'Verified POS item'}</p>
+            </div>
+          </div>
+        </td>
+        <td class="py-3.5 px-4 text-center">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 tabular-nums">
+            ${item.quantity}
+          </span>
+        </td>
+        <td class="py-3.5 px-4 text-right font-medium text-gray-700 dark:text-gray-300 font-mono tabular-nums">
+          ${sym}${item.price.toFixed(2)}
+        </td>
+        <td class="py-3.5 px-4 text-right font-extrabold text-gray-900 dark:text-white font-mono tabular-nums text-sm">
+          ${sym}${(item.price * item.quantity).toFixed(2)}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Pre-sync note if already present
+  const orderNote = document.getElementById('orderNoteInput');
+  const osOrderNote = document.getElementById('osOrderNoteInput');
+  if (orderNote && osOrderNote && orderNote.value) {
+    osOrderNote.value = orderNote.value;
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// ── Stage 2: Proceed from Order Summary to Payment Screen ───────────
+function proceedToPayment() {
+  if (cart.length === 0) {
+    backToRegister();
+    return;
+  }
+
+  // Sync order note
+  const osOrderNote = document.getElementById('osOrderNoteInput');
+  const orderNote = document.getElementById('orderNoteInput');
+  if (osOrderNote && orderNote) {
+    orderNote.value = osOrderNote.value;
+  }
+
+  const osView = document.getElementById('posOrderSummaryView');
+  if (osView) {
+    osView.classList.add('hidden');
+    osView.classList.remove('flex');
+  }
+
+  // Open the payment checkout screen
+  openCheckout();
+}
+
+// ── Back Navigation from Payment Screen to Order Summary ───────────
+function backToOrderSummary() {
+  const coView = document.getElementById('posCheckoutView');
+  if (coView) {
+    coView.classList.add('hidden');
+    coView.classList.remove('flex');
+  }
+  openOrderSummary();
+}
+
+// Checkout flow — dedicated checkout / payment screen (Step 2)
 function openCheckout() {
   if (cart.length === 0) return;
   const sym = getCurrencySymbol();
 
   const regView = document.getElementById('posRegisterView');
+  const osView = document.getElementById('posOrderSummaryView');
   const coView = document.getElementById('posCheckoutView');
   if (regView) regView.classList.add('hidden');
+  if (osView) {
+    osView.classList.add('hidden');
+    osView.classList.remove('flex');
+  }
   if (coView) {
     coView.classList.remove('hidden');
     coView.classList.add('flex');
@@ -624,12 +791,20 @@ function openCheckout() {
 
 function backToRegister() {
   const regView = document.getElementById('posRegisterView');
+  const osView = document.getElementById('posOrderSummaryView');
   const coView = document.getElementById('posCheckoutView');
+
+  if (osView) {
+    osView.classList.add('hidden');
+    osView.classList.remove('flex');
+  }
   if (coView) {
     coView.classList.add('hidden');
     coView.classList.remove('flex');
   }
-  if (regView) regView.classList.remove('hidden');
+  if (regView) {
+    regView.classList.remove('hidden');
+  }
 
   const barcodeInput = document.getElementById('barcodeInput');
   if (barcodeInput) barcodeInput.focus();
@@ -1245,6 +1420,22 @@ async function processSale() {
     showReceipt(localOrder);
     clearCart();
 
+    // Ensure checkout & summary views are closed and register view is restored underneath
+    const coView = document.getElementById('posCheckoutView');
+    const osView = document.getElementById('posOrderSummaryView');
+    const regView = document.getElementById('posRegisterView');
+    if (coView) {
+      coView.classList.add('hidden');
+      coView.classList.remove('flex');
+    }
+    if (osView) {
+      osView.classList.add('hidden');
+      osView.classList.remove('flex');
+    }
+    if (regView) {
+      regView.classList.remove('hidden');
+    }
+
     if (!navigator.onLine && typeof showToast === 'function') {
       showToast('Sale saved locally in offline mode. Will automatically sync when online.', 'warning');
     }
@@ -1455,11 +1646,11 @@ if (!window.posGlobalListenersAttached) {
   document.addEventListener('click', function (e) {
     const tag = e.target.tagName;
     if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'BUTTON') return;
-    if (e.target.closest('#cart') || e.target.closest('#receiptModal') || e.target.closest('#posCheckoutView')) return;
+    if (e.target.closest('#cart') || e.target.closest('#receiptModal') || e.target.closest('#posCheckoutView') || e.target.closest('#posOrderSummaryView')) return;
     if (e.target.closest('#customerPicker')) return;
     closeCustomerDropdown();
     const barcodeInput = document.getElementById('barcodeInput');
-    if (barcodeInput && !document.getElementById('posCheckoutView')?.classList.contains('flex')) {
+    if (barcodeInput && !document.getElementById('posCheckoutView')?.classList.contains('flex') && !document.getElementById('posOrderSummaryView')?.classList.contains('flex')) {
       barcodeInput.focus();
     }
   });
@@ -1467,6 +1658,8 @@ if (!window.posGlobalListenersAttached) {
   document.addEventListener('keydown', function (e) {
     const coView = document.getElementById('posCheckoutView');
     const isCheckoutActive = coView && !coView.classList.contains('hidden');
+    const osView = document.getElementById('posOrderSummaryView');
+    const isSummaryActive = osView && !osView.classList.contains('hidden');
     const receiptModal = document.getElementById('receiptModal');
     const isReceiptActive = receiptModal && !receiptModal.classList.contains('hidden');
 
@@ -1476,6 +1669,10 @@ if (!window.posGlobalListenersAttached) {
         return;
       }
       if (isCheckoutActive) {
+        backToOrderSummary();
+        return;
+      }
+      if (isSummaryActive) {
         backToRegister();
         return;
       }
@@ -1489,11 +1686,14 @@ if (!window.posGlobalListenersAttached) {
       return;
     }
 
-    if ((e.code === 'Space' || e.key === 'F2') && !isCheckoutActive && !isReceiptActive) {
+    if ((e.code === 'Space' || e.key === 'F2') && !isCheckoutActive && !isSummaryActive && !isReceiptActive) {
       if (cart.length > 0) {
         e.preventDefault();
-        openCheckout();
+        openOrderSummary();
       }
+    } else if ((e.key === 'Enter' || e.key === 'F4') && isSummaryActive && !isReceiptActive) {
+      e.preventDefault();
+      proceedToPayment();
     } else if ((e.key === 'F4' || e.key === 'Enter') && isCheckoutActive && !isReceiptActive) {
       e.preventDefault();
       processSale();
@@ -1547,6 +1747,9 @@ window.filterCustomers = filterCustomers;
 window.filterProducts = filterProducts;
 window.setCategory = setCategory;
 window.handleBarcodeScan = handleBarcodeScan;
+window.openOrderSummary = openOrderSummary;
+window.proceedToPayment = proceedToPayment;
+window.backToOrderSummary = backToOrderSummary;
 window.openCheckout = openCheckout;
 window.backToRegister = backToRegister;
 window.setPayment = setPayment;

@@ -1,31 +1,14 @@
 import json
 import os
-import shutil
-from datetime import datetime
-from pathlib import Path
 
 from django.conf import settings as django_settings
 from django.contrib import messages
-from django.http import FileResponse, Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.core.models import StoreSettings, PaymentAccount
 from apps.core.utils import admin_required_pos, login_required_pos, parse_float, render_pos
-
-BACKUP_DIR = os.path.join(django_settings.BASE_DIR, "backups")
-
-
-def _ensure_backup_dir():
-    os.makedirs(BACKUP_DIR, exist_ok=True)
-
-
-def _fmt_size(num):
-    for unit in ["B", "KB", "MB", "GB"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f} {unit}"
-        num /= 1024.0
-    return f"{num:.1f} TB"
 
 
 def manifest_view(request):
@@ -50,22 +33,6 @@ def service_worker_view(request):
 
 def offline_view(request):
     return render_pos(request, "offline.html", {"active_view": "offline"})
-
-
-
-def _backup_list():
-    _ensure_backup_dir()
-    files = []
-    for f in sorted(Path(BACKUP_DIR).glob("quickpos_*.db"), reverse=True):
-        size = os.path.getsize(f)
-        mtime = datetime.fromtimestamp(os.path.getmtime(f)).isoformat()
-        files.append({"name": f.name, "size": size, "size_fmt": _fmt_size(size), "mtime": mtime})
-    return files
-
-
-def _get_db_path():
-    db_conf = django_settings.DATABASES.get("default", {})
-    return str(db_conf.get("NAME", os.path.join(django_settings.BASE_DIR, "quickpos.sqlite3")))
 
 
 SUPPORTED_CURRENCIES = [
@@ -265,78 +232,5 @@ def payment_account_delete(request, account_id):
         return JsonResponse({"success": True})
     return redirect("/settings")
 
-
-@admin_required_pos
-def backup_view(request):
-    settings = StoreSettings.get_settings()
-    db_path = _get_db_path()
-    db_size = os.path.getsize(db_path) if os.path.exists(db_path) else 0
-    db_mtime = datetime.fromtimestamp(os.path.getmtime(db_path)).isoformat() if os.path.exists(db_path) else ""
-    snapshots = _backup_list()
-
-    return render_pos(
-        request,
-        "backup.html",
-        {
-            "active_view": "backup",
-            "settings": settings,
-            "db_size": db_size,
-            "db_size_fmt": _fmt_size(db_size),
-            "db_mtime": db_mtime,
-            "snapshots": snapshots,
-        },
-    )
-
-
-@csrf_exempt
-@admin_required_pos
-def backup_create(request):
-    _ensure_backup_dir()
-    db_path = _get_db_path()
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    name = f"quickpos_{ts}.db"
-    dest = os.path.join(BACKUP_DIR, name)
-    try:
-        if os.path.exists(db_path):
-            shutil.copy2(db_path, dest)
-            messages.success(request, f"Backup created: {name}")
-        else:
-            messages.error(request, "Database file not found to backup")
-    except Exception as e:
-        messages.error(request, f"Backup failed: {e}")
-    return redirect("/backup")
-
-
-@admin_required_pos
-def backup_download(request):
-    db_path = _get_db_path()
-    if not os.path.exists(db_path):
-        messages.error(request, "Database file not found")
-        return redirect("/backup")
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    return FileResponse(open(db_path, "rb"), as_attachment=True, filename=f"quickpos_{ts}.db")
-
-
-@admin_required_pos
-def backup_download_snapshot(request, filename):
-    safe = os.path.basename(filename)
-    path = os.path.join(BACKUP_DIR, safe)
-    if not os.path.exists(path) or not safe.startswith("quickpos_") or not safe.endswith(".db"):
-        messages.error(request, "Invalid backup file")
-        return redirect("/backup")
-    return FileResponse(open(path, "rb"), as_attachment=True, filename=safe)
-
-
-@csrf_exempt
-@admin_required_pos
-def backup_delete(request, filename):
-    safe = os.path.basename(filename)
-    path = os.path.join(BACKUP_DIR, safe)
-    if os.path.exists(path) and safe.startswith("quickpos_") and safe.endswith(".db"):
-        os.remove(path)
-        messages.success(request, f"Deleted {safe}")
-    else:
-        messages.error(request, "Invalid backup file")
-    return redirect("/backup")
 
 

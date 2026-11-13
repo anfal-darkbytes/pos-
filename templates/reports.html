@@ -1,184 +1,794 @@
 {% extends "base.html" %}
-{% block title %}Reports{% endblock %}
-{% block page_title %}Reports{% endblock %}
-{% block page_subtitle %}Sales analytics & insights{% endblock %}
+{% block title %}Reports &amp; Analytics{% endblock %}
+{% block page_title %}Financial Analytics{% endblock %}
+{% block page_subtitle %}Comprehensive sales velocity, profitability margins &amp; product performance{% endblock %}
 
 {% block content %}
 <div class="p-6 space-y-6 pos-view-enter">
-  <div class="flex items-center justify-between">
-    <div><h2 class="text-lg font-semibold">Sales Analytics</h2><p class="text-xs text-gray-500">{{ date_from }} to {{ date_to }} · {{ summary.total_orders }} orders</p></div>
-    <form method="GET" class="flex flex-wrap items-end gap-3">
-      <div><label class="text-[11px] font-medium text-gray-500 block mb-1">From</label><input type="date" name="date_from" value="{{ date_from }}" class="h-8 px-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs focus:border-primary-500 focus:outline-none" /></div>
-      <div><label class="text-[11px] font-medium text-gray-500 block mb-1">To</label><input type="date" name="date_to" value="{{ date_to }}" class="h-8 px-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs focus:border-primary-500 focus:outline-none" /></div>
-      <button type="submit" class="h-8 px-3 rounded-md bg-primary-500 text-white text-xs font-medium hover:bg-primary-600">Filter</button>
-      <a href="/reports" class="h-8 px-3 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">Reset</a>
+
+  <!-- ── 1. Executive Analytics Header Banner ────────────────────────────── -->
+  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/20 via-white to-teal-950/10 dark:from-emerald-950/40 dark:via-gray-900/90 dark:to-gray-950 border border-emerald-500/20 dark:border-emerald-800/40 p-6 shadow-xs backdrop-blur-sm">
+    <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/10 dark:bg-emerald-400/5 blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2.5">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Financial Intelligence</span>
+          </span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">·</span>
+          <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">{{ settings.store_name }}</span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          Sales &amp; Profitability <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300">Reports</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+          Showing trading activity from <span class="font-bold text-gray-700 dark:text-gray-300">{{ date_from }}</span> to <span class="font-bold text-gray-700 dark:text-gray-300">{{ date_to }}</span> · <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ summary.total_orders }} orders processed</span>.
+        </p>
+      </div>
+
+      <!-- Quick Action Shortcuts -->
+      <div class="flex flex-wrap items-center gap-3 shrink-0">
+        <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 text-xs font-bold transition-all shadow-xs hover:border-gray-300 cursor-pointer">
+          <i data-lucide="printer" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+          <span>Print Financial Summary</span>
+        </button>
+
+        <a href="/pos" class="pos-hero-btn inline-flex items-center gap-2.5 h-10 px-5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold tracking-wide shadow-md shadow-emerald-600/25 hover:shadow-lg hover:shadow-emerald-600/35 transition-all cursor-pointer">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+          <span>Launch POS Terminal</span>
+          <span class="ml-1 text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/25 text-white/90 border border-white/15">F1</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Smooth Date Range Toolbar & Filter Presets ──────────────────── -->
+  <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Preset Quick Filter Buttons -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pos-scroll pb-1 md:pb-0">
+      <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mr-1 hidden sm:inline">Range:</span>
+      
+      <button type="button" onclick="setPreset('{{ presets.today_from }}', '{{ presets.today_to }}')"
+        class="h-8 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 {% if presets.active == 'today' %}bg-emerald-500 text-white shadow-xs{% else %}bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300{% endif %}">
+        Today
+      </button>
+
+      <button type="button" onclick="setPreset('{{ presets.seven_from }}', '{{ presets.seven_to }}')"
+        class="h-8 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 {% if presets.active == '7d' %}bg-emerald-500 text-white shadow-xs{% else %}bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300{% endif %}">
+        Last 7 Days
+      </button>
+
+      <button type="button" onclick="setPreset('{{ presets.thirty_from }}', '{{ presets.thirty_to }}')"
+        class="h-8 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 {% if presets.active == '30d' %}bg-emerald-500 text-white shadow-xs{% else %}bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300{% endif %}">
+        Last 30 Days
+      </button>
+
+      <button type="button" onclick="setPreset('{{ presets.month_from }}', '{{ presets.month_to }}')"
+        class="h-8 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 {% if presets.active == 'month' %}bg-emerald-500 text-white shadow-xs{% else %}bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300{% endif %}">
+        This Month
+      </button>
+
+      <button type="button" onclick="setPreset('{{ presets.ytd_from }}', '{{ presets.ytd_to }}')"
+        class="h-8 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 {% if presets.active == 'ytd' %}bg-emerald-500 text-white shadow-xs{% else %}bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300{% endif %}">
+        Year to Date
+      </button>
+    </div>
+
+    <!-- Custom Date Range Form -->
+    <form id="reportFilterForm" method="GET" class="flex flex-wrap items-center gap-2">
+      <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-2.5 py-1 rounded-xl border border-gray-200 dark:border-gray-700">
+        <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
+        <input type="date" id="filterDateFrom" name="date_from" value="{{ date_from }}"
+          class="bg-transparent border-0 p-0 text-xs font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-0" />
+        <span class="text-xs text-gray-400 font-bold">to</span>
+        <input type="date" id="filterDateTo" name="date_to" value="{{ date_to }}"
+          class="bg-transparent border-0 p-0 text-xs font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-0" />
+      </div>
+
+      <button type="submit" class="h-8 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs">
+        Filter
+      </button>
+
+      <a href="/reports" class="h-8 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-semibold flex items-center transition-colors">
+        Reset
+      </a>
     </form>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    {% set kpis = [
-      ('Total Revenue', summary.total_revenue | money, summary.total_orders | string + ' orders', 'dollar-sign', 'emerald'),
-      ('Gross Profit', summary.total_profit | money, summary.profit_margin | string + '% margin', 'trending-up', 'sky'),
-      ('Items Sold', summary.total_items | string, (summary.total_items / summary.total_orders if summary.total_orders > 0 else 0) | round(1) | string + ' per order', 'shopping-cart', 'orange'),
-      ('Avg Order Value', summary.avg_order_value | money, 'Per transaction', 'receipt', 'purple'),
-    ] %}
-    {% for label, value, sub, icon, color in kpis %}
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+  <!-- ── 3. Four Primary Financial KPI Cards (Elevated Surface) ─────────── -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- Card 1: Total Gross Revenue -->
+    <div class="group relative rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md hover:border-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5 overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       <div class="flex items-start justify-between gap-3">
-        <div><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ label }}</p><p class="mt-2 text-2xl font-bold tracking-tight">{{ value }}</p><p class="mt-1 text-xs text-gray-500">{{ sub }}</p></div>
-        <div class="grid place-items-center w-11 h-11 rounded-xl shrink-0 bg-{{ color }}-100 text-{{ color }}-700 dark:bg-{{ color }}-900/40 dark:text-{{ color }}-300"><i data-lucide="{{ icon }}" class="w-5 h-5"></i></div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-
-  <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-    <div class="flex items-start justify-between mb-4">
-      <div><h3 class="font-semibold text-base">Revenue vs Profit Trend</h3><p class="text-xs text-gray-500">Daily breakdown over the selected period</p></div>
-      <div class="flex items-center gap-3 text-xs">
-        <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-primary-500"></div><span class="text-gray-500">Revenue</span></div>
-        <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-emerald-500"></div><span class="text-gray-500">Profit</span></div>
-      </div>
-    </div>
-    <div class="h-80"><canvas id="revProfitChart"></canvas></div>
-  </div>
-
-  <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-    <h3 class="font-semibold text-base mb-1">Daily Order Volume</h3>
-    <p class="text-xs text-gray-500 mb-3">Number of transactions per day</p>
-    <div class="h-56"><canvas id="ordersChart"></canvas></div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-      <h3 class="font-semibold text-base mb-1">Revenue by Category</h3>
-      <p class="text-xs text-gray-500 mb-3">Profit contribution</p>
-      <div class="h-60"><canvas id="catChart"></canvas></div>
-    </div>
-    <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-      <h3 class="font-semibold text-base mb-1">Category Performance</h3>
-      <p class="text-xs text-gray-500 mb-3">Revenue and profit by category</p>
-      <div class="h-60"><canvas id="catBarChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-      <h3 class="font-semibold text-base mb-3">Payment Methods</h3>
-      <div class="space-y-3">
-        {% set total_payments = payment_breakdown | sum(attribute='total') %}
-        {% for p in payment_breakdown %}
-        {% set pct = (p.total / total_payments * 100) if total_payments > 0 else 0 %}
-        <div class="space-y-1.5">
-          <div class="flex items-center gap-2">
-            <div class="grid place-items-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">{% if p.payment_method == 'cash' %}<i data-lucide="banknote" class="w-4 h-4"></i>{% elif p.payment_method == 'card' %}<i data-lucide="credit-card" class="w-4 h-4"></i>{% else %}<i data-lucide="wallet" class="w-4 h-4"></i>{% endif %}</div>
-            <div class="flex-1 flex items-center justify-between"><span class="text-sm font-medium capitalize">{{ p.payment_method }}</span><span class="text-sm font-semibold tabular-nums">{{ p.total | money }}</span></div>
+        <div class="min-w-0 flex-1">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Gross Revenue</p>
+          <p class="mt-2 text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums">{{ summary.total_revenue | money }}</p>
+          
+          <div class="mt-3 flex items-center gap-1.5 text-[11px]">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              <i data-lucide="receipt" class="w-3 h-3 text-emerald-500"></i>
+              <span>{{ summary.total_orders }} orders</span>
+            </span>
+            <span class="text-gray-400 font-medium">in period</span>
           </div>
-          <div class="flex items-center gap-2 text-[11px] text-gray-500"><div class="flex-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden"><div class="h-full bg-primary-500 rounded-full" style="width: {{ pct }}%"></div></div><span class="tabular-nums">{{ p.count }} · {{ pct | round(0) | int }}%</span></div>
+        </div>
+
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+          <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-500">
+        <span>Average Ticket (AOV)</span>
+        <span class="font-bold text-gray-700 dark:text-gray-300 tabular-nums">{{ summary.avg_order_value | money }}</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Gross Profit -->
+    <div class="group relative rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md hover:border-cyan-500/40 transition-all duration-200 hover:-translate-y-0.5 overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-sky-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Gross Profit (COGS)</p>
+          <p class="mt-2 text-2xl lg:text-3xl font-extrabold text-cyan-600 dark:text-cyan-400 tracking-tight tabular-nums">{{ summary.total_profit | money }}</p>
+          
+          <div class="mt-3 flex items-center gap-1.5 text-[11px]">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/60">
+              <i data-lucide="percent" class="w-3 h-3 text-cyan-500"></i>
+              <span>{{ summary.profit_margin }}% Margin</span>
+            </span>
+            <span class="text-gray-400 font-medium">blended</span>
+          </div>
+        </div>
+
+        <div class="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 border border-cyan-200/60 dark:border-cyan-800/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+          <i data-lucide="trending-up" class="w-6 h-6"></i>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-500">
+        <span>Product COGS Cost</span>
+        <span class="font-bold text-gray-700 dark:text-gray-300 tabular-nums">{{ summary.cogs | money }}</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Items Sold Volume -->
+    <div class="group relative rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md hover:border-amber-500/40 transition-all duration-200 hover:-translate-y-0.5 overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Items Dispatched</p>
+          <p class="mt-2 text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums">{{ summary.total_items }}</p>
+          
+          <div class="mt-3 flex items-center gap-1.5 text-[11px]">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+              <i data-lucide="layers" class="w-3 h-3 text-amber-500"></i>
+              <span>{{ (summary.total_items / summary.total_orders if summary.total_orders > 0 else 0) | round(1) }} items/order</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+          <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-500">
+        <span>Cart Dispersion</span>
+        <span class="font-bold text-gray-700 dark:text-gray-300">{{ top_products | length }} unique items sold</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Average Order Value -->
+    <div class="group relative rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md hover:border-purple-500/40 transition-all duration-200 hover:-translate-y-0.5 overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Average Transaction Ticket</p>
+          <p class="mt-2 text-2xl lg:text-3xl font-extrabold text-purple-600 dark:text-purple-400 tracking-tight tabular-nums">{{ summary.avg_order_value | money }}</p>
+          
+          <div class="mt-3 flex items-center gap-1.5 text-[11px]">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+              <i data-lucide="receipt" class="w-3 h-3 text-purple-500"></i>
+              <span>Per Transaction</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+          <i data-lucide="wallet-cards" class="w-6 h-6"></i>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-500">
+        <span>Settlement Frequency</span>
+        <a href="/orders" class="font-bold text-purple-600 dark:text-purple-400 hover:underline">View Sales Ledger →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 4. Primary Chart Section: Revenue & Profit Velocity ────────────── -->
+  <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md transition-all duration-200">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3.5 border-b border-gray-100 dark:border-gray-800/80">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 grid place-items-center shadow-2xs shrink-0">
+          <i data-lucide="trending-up" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-gray-900 dark:text-white">Revenue vs. Gross Profit Velocity</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Daily sales curve and earnings trajectory over the selected period</p>
+        </div>
+      </div>
+
+      <!-- Legend & Summary Chips -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span>Revenue: {{ summary.total_revenue | money }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800/60 text-xs font-bold text-cyan-700 dark:text-cyan-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+          <span>Profit: {{ summary.total_profit | money }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative h-80 w-full">
+      <canvas id="revProfitChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ── 5. Secondary Analytics Section: Orders Velocity & Category Performance ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Card 1: Daily Order Volume -->
+    <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800/80 mb-3.5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 grid place-items-center shadow-2xs shrink-0">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-900 dark:text-white">Daily Order Volume</h3>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Checkout transaction frequency</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 tabular-nums">
+            {{ summary.total_orders }} total
+          </span>
+        </div>
+
+        <div class="relative h-60 w-full mt-2">
+          <canvas id="ordersChart"></canvas>
+        </div>
+      </div>
+
+      <div class="pt-3 mt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-400">
+        <span>Order Velocity</span>
+        <span class="font-semibold text-gray-700 dark:text-gray-300">{{ summary.total_items }} products dispatched</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Category Sales & Profit Breakdown -->
+    <div class="lg:col-span-2 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800/80 mb-3.5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60 grid place-items-center shadow-2xs shrink-0">
+              <i data-lucide="pie-chart" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-900 dark:text-white">Category Sales &amp; Profit Margins</h3>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Revenue generation compared with gross profit contribution</p>
+            </div>
+          </div>
+
+          <span class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+            {{ category_breakdown | length }} Active Categories
+          </span>
+        </div>
+
+        <div class="relative h-60 w-full mt-2">
+          <canvas id="catBarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Category Legend Bars -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 mt-2 border-t border-gray-100 dark:border-gray-800/80">
+        {% for c in category_breakdown[:4] %}
+        <div class="p-2.5 rounded-xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800/70 space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="font-bold text-gray-800 dark:text-gray-200 truncate">{{ c.name }}</span>
+            </div>
+            <span class="font-mono text-[10px] text-gray-400 font-bold">{{ c.share_pct }}%</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-gray-500">
+            <span>Rev: <strong class="text-gray-800 dark:text-gray-200">{{ c.revenue | money }}</strong></span>
+            <span>Profit: <strong class="text-emerald-600 dark:text-emerald-400">{{ c.profit | money }}</strong></span>
+          </div>
         </div>
         {% endfor %}
       </div>
     </div>
-    <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <div class="p-5 pb-3"><h3 class="font-semibold text-base">Top 10 Products</h3><p class="text-xs text-gray-500">By revenue · {{ top_products | length }} products sold</p></div>
-      <div class="overflow-x-auto pos-scroll max-h-72">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0">
-            <tr class="text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-              <th class="px-4 py-2 w-8">#</th><th class="px-4 py-2">Product</th><th class="px-4 py-2">Category</th>
-              <th class="px-4 py-2 text-right">Qty</th><th class="px-4 py-2 text-right">Revenue</th><th class="px-4 py-2 text-right">Profit</th><th class="px-4 py-2 text-right">Margin</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-            {% for p in top_products[:10] %}
-            <tr>
-              <td class="px-4 py-2"><div class="grid place-items-center w-6 h-6 rounded-md bg-primary-100 text-primary-700 text-xs font-bold">{{ loop.index }}</div></td>
-              <td class="px-4 py-2 font-medium text-sm">{{ p.name }}</td>
-              <td class="px-4 py-2"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] border border-gray-200 dark:border-gray-700">{{ p.category }}</span></td>
-              <td class="px-4 py-2 text-right tabular-nums">{{ p.quantity }}</td>
-              <td class="px-4 py-2 text-right font-medium tabular-nums">{{ p.revenue | money }}</td>
-              <td class="px-4 py-2 text-right tabular-nums text-emerald-600">{{ p.profit | money }}</td>
-              <td class="px-4 py-2 text-right"><span class="text-xs font-semibold {% if p.margin > 50 %}text-emerald-600{% elif p.margin > 30 %}text-amber-600{% else %}text-red-600{% endif %}">{{ p.margin | round(0) | int }}%</span></td>
-            </tr>
+
+  </div>
+
+  <!-- ── 6. Bottom Analytics Section: Payment Methods & Top 10 Product Profitability ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Payment Methods Distribution -->
+    <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800/80 mb-3.5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60 grid place-items-center shadow-2xs shrink-0">
+              <i data-lucide="wallet" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-900 dark:text-white">Payment Tenders</h3>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Total settlement share</p>
+            </div>
+          </div>
+
+          <span class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 tabular-nums">
+            {{ summary.total_revenue | money }}
+          </span>
+        </div>
+
+        <!-- Segmented bar -->
+        {% if payment_breakdown %}
+        <div class="mb-3.5">
+          <div class="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex shadow-inner">
+            {% for p in payment_breakdown %}
+            <div class="h-full transition-all duration-500 {% if p.payment_method == 'cash' %}bg-emerald-500{% elif p.payment_method in ['card', 'bank'] %}bg-blue-500{% elif p.payment_method == 'split' %}bg-amber-500{% else %}bg-purple-500{% endif %}"
+              style="width: {{ p.share_pct }}%" title="{{ p.payment_method | capitalize }}: {{ p.share_pct }}%"></div>
             {% endfor %}
-          </tbody>
-        </table>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="space-y-2.5 max-h-72 overflow-y-auto pos-scroll pr-1">
+          {% if not payment_breakdown %}
+          <div class="text-center text-gray-400 text-xs py-14">
+            <div class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400 grid place-items-center mx-auto mb-2">
+              <i data-lucide="wallet" class="w-5 h-5"></i>
+            </div>
+            <p class="font-semibold text-gray-600 dark:text-gray-300">No payment records found</p>
+          </div>
+          {% endif %}
+
+          {% for p in payment_breakdown %}
+          <div class="p-2.5 rounded-xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800/80 space-y-2">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg grid place-items-center shrink-0 shadow-2xs {% if p.payment_method == 'cash' %}bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400{% elif p.payment_method in ['card', 'bank'] %}bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400{% elif p.payment_method == 'split' %}bg-amber-100/80 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400{% else %}bg-purple-100/80 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400{% endif %}">
+                  {% if p.payment_method == 'cash' %}<i data-lucide="banknote" class="w-4 h-4"></i>
+                  {% elif p.payment_method in ['card', 'bank'] %}<i data-lucide="landmark" class="w-4 h-4"></i>
+                  {% elif p.payment_method == 'split' %}<i data-lucide="pie-chart" class="w-4 h-4"></i>
+                  {% else %}<i data-lucide="wallet" class="w-4 h-4"></i>{% endif %}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs font-bold text-gray-900 dark:text-white capitalize truncate">{{ p.payment_method }}</p>
+                  <p class="text-[10px] text-gray-400 font-medium">{{ p.count }} transaction{% if p.count != 1 %}s{% endif %}</p>
+                </div>
+              </div>
+
+              <div class="text-right shrink-0">
+                <p class="text-xs font-extrabold text-gray-900 dark:text-white tabular-nums">{{ p.total | money }}</p>
+                <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">{{ p.share_pct }}%</span>
+              </div>
+            </div>
+
+            <div class="w-full h-1 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500 {% if p.payment_method == 'cash' %}bg-emerald-500{% elif p.payment_method in ['card', 'bank'] %}bg-blue-500{% elif p.payment_method == 'split' %}bg-amber-500{% else %}bg-purple-500{% endif %}" style="width: {{ p.share_pct }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="pt-3 mt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-[11px] text-gray-400">
+        <span>Payment Settlement</span>
+        <span class="font-bold text-emerald-600 dark:text-emerald-400">100% Reconciled</span>
+      </div>
+    </div>
+
+    <!-- Top 10 Product Profitability Leaderboard -->
+    <div class="lg:col-span-2 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="p-5 pb-3.5 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 grid place-items-center shadow-2xs shrink-0">
+              <i data-lucide="award" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-900 dark:text-white">Top 10 Products by Profitability</h3>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">Ranked by revenue generation, unit volume and net margin %</p>
+            </div>
+          </div>
+
+          <a href="/products" class="h-8 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+            <span>Manage Catalog</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-emerald-500"></i>
+          </a>
+        </div>
+
+        <div class="overflow-x-auto pos-scroll">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50/70 dark:bg-gray-800/50 text-[10.5px] uppercase tracking-wider text-gray-400 font-bold border-b border-gray-100 dark:border-gray-800">
+              <tr>
+                <th class="px-5 py-3 w-10 text-center">#</th>
+                <th class="px-5 py-3">Product Title</th>
+                <th class="px-5 py-3">Category</th>
+                <th class="px-5 py-3 text-right">Qty</th>
+                <th class="px-5 py-3 text-right">Revenue</th>
+                <th class="px-5 py-3 text-right">Gross Profit</th>
+                <th class="px-5 py-3 text-right">Margin %</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800/80">
+              {% if not top_products %}
+              <tr>
+                <td colspan="7" class="py-14 text-center text-gray-400 text-xs">
+                  <div class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400 grid place-items-center mx-auto mb-2">
+                    <i data-lucide="package-search" class="w-5 h-5"></i>
+                  </div>
+                  <p class="font-semibold text-gray-600 dark:text-gray-300">No product sales in this period</p>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% for p in top_products %}
+              <tr class="hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors">
+                <td class="px-5 py-3 text-center">
+                  {% if loop.index == 1 %}
+                  <div class="w-6 h-6 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[11px] grid place-items-center mx-auto shadow-xs">1</div>
+                  {% elif loop.index == 2 %}
+                  <div class="w-6 h-6 rounded-md bg-gradient-to-br from-slate-400 to-slate-600 text-white font-black text-[11px] grid place-items-center mx-auto shadow-xs">2</div>
+                  {% elif loop.index == 3 %}
+                  <div class="w-6 h-6 rounded-md bg-gradient-to-br from-amber-600 to-amber-800 text-white font-black text-[11px] grid place-items-center mx-auto shadow-xs">3</div>
+                  {% else %}
+                  <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold text-[11px] grid place-items-center mx-auto">{{ loop.index }}</div>
+                  {% endif %}
+                </td>
+                <td class="px-5 py-3">
+                  <span class="font-bold text-gray-900 dark:text-white truncate block max-w-[200px]">{{ p.name }}</span>
+                </td>
+                <td class="px-5 py-3">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">{{ p.category }}</span>
+                </td>
+                <td class="px-5 py-3 text-right font-semibold tabular-nums text-gray-700 dark:text-gray-300">
+                  {{ p.quantity }}
+                </td>
+                <td class="px-5 py-3 text-right font-bold tabular-nums text-gray-900 dark:text-white">
+                  {{ p.revenue | money }}
+                </td>
+                <td class="px-5 py-3 text-right font-extrabold tabular-nums text-emerald-600 dark:text-emerald-400">
+                  {{ p.profit | money }}
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-extrabold {% if p.margin >= 50 %}bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60{% elif p.margin >= 25 %}bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60{% else %}bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60{% endif %}">
+                    {{ p.margin }}%
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-800/30 flex items-center justify-between text-[11px] text-gray-400">
+        <span>Ranked by gross sales volume contribution</span>
+        <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ top_products | length }} Products Evaluated</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 7. Executive Financial Summary Statement (Bottom Master Card) ──── -->
+  <div class="rounded-2xl bg-gradient-to-r from-emerald-900/10 via-emerald-800/5 to-teal-900/10 dark:from-emerald-950/40 dark:via-gray-900 dark:to-teal-950/30 border border-emerald-500/20 dark:border-emerald-800/40 p-6 shadow-xs backdrop-blur-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-emerald-500/15 dark:border-emerald-800/40">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 grid place-items-center">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+        </div>
+        <h3 class="font-extrabold text-sm text-gray-900 dark:text-white uppercase tracking-wider">Executive Financial Statement</h3>
+      </div>
+      <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Period: {{ date_from }} to {{ date_to }}</span>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div class="p-3 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-emerald-500/15 dark:border-emerald-800/30 shadow-2xs">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Gross Revenue</span>
+        <span class="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">{{ summary.total_revenue | money }}</span>
+      </div>
+
+      <div class="p-3 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-emerald-500/15 dark:border-emerald-800/30 shadow-2xs">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Cost of Goods (COGS)</span>
+        <span class="text-lg sm:text-xl font-extrabold text-gray-700 dark:text-gray-300 tabular-nums">{{ summary.cogs | money }}</span>
+      </div>
+
+      <div class="p-3 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-emerald-500/15 dark:border-emerald-800/30 shadow-2xs">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Net Gross Profit</span>
+        <span class="text-lg sm:text-xl font-extrabold text-teal-600 dark:text-teal-400 tabular-nums">{{ summary.total_profit | money }}</span>
+      </div>
+
+      <div class="p-3 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-emerald-500/15 dark:border-emerald-800/30 shadow-2xs">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Blended Margin</span>
+        <span class="text-lg sm:text-xl font-extrabold text-cyan-600 dark:text-cyan-400 flex items-center gap-1 tabular-nums">
+          <i data-lucide="percent" class="w-4 h-4"></i>{{ summary.profit_margin }}%
+        </span>
+      </div>
+
+      <div class="p-3 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-emerald-500/15 dark:border-emerald-800/30 shadow-2xs col-span-2 md:col-span-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Transactions</span>
+        <span class="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white tabular-nums">{{ summary.total_orders }} orders</span>
       </div>
     </div>
   </div>
 
-  <div class="bg-primary-50 dark:bg-emerald-900/20 rounded-xl border border-primary-200 dark:border-emerald-800 p-5">
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-      <div><p class="text-xs text-gray-500">Total Revenue</p><p class="text-xl font-bold text-primary-600">{{ summary.total_revenue | money }}</p></div>
-      <div><p class="text-xs text-gray-500">Gross Profit</p><p class="text-xl font-bold text-emerald-600">{{ summary.total_profit | money }}</p></div>
-      <div><p class="text-xs text-gray-500">Profit Margin</p><p class="text-xl font-bold flex items-center gap-1"><i data-lucide="percent" class="w-4 h-4"></i>{{ summary.profit_margin }}%</p></div>
-      <div><p class="text-xs text-gray-500">Orders</p><p class="text-xl font-bold tabular-nums">{{ summary.total_orders }}</p></div>
-      <div><p class="text-xs text-gray-500">Items Sold</p><p class="text-xl font-bold tabular-nums">{{ summary.total_items }}</p></div>
-    </div>
-  </div>
 </div>
 
+<!-- ── 8. Chart.js Modern Initializations & Script Logic ──────────────── -->
 <script>
 (function () {
   var symbol = window.currencySymbol || "{{ settings.currency_symbol }}";
+  var isDark = document.documentElement.classList.contains('dark');
+  var gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(156, 163, 175, 0.12)';
+  var textColor = isDark ? '#9ca3af' : '#6b7280';
+
   var daily = {{ daily_sales | tojson }};
   var cats = {{ category_breakdown | tojson }};
-  var tops = {{ top_products | tojson }};
 
-  // Revenue vs Profit
+  // 1. Revenue vs. Profit Line & Area Chart
   var revCtx = document.getElementById('revProfitChart');
   if (revCtx) {
+    var ctx = revCtx.getContext('2d');
+
+    // Revenue Gradient
+    var revGrad = ctx.createLinearGradient(0, 0, 0, 280);
+    revGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+    revGrad.addColorStop(0.7, 'rgba(16, 185, 129, 0.04)');
+    revGrad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+    // Profit Gradient
+    var profitGrad = ctx.createLinearGradient(0, 0, 0, 280);
+    profitGrad.addColorStop(0, 'rgba(6, 182, 212, 0.20)');
+    profitGrad.addColorStop(0.7, 'rgba(6, 182, 212, 0.03)');
+    profitGrad.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
     new Chart(revCtx, {
       type: 'line',
       data: {
-        labels: daily.map(d => d.label),
+        labels: daily.map(function(d) { return d.label; }),
         datasets: [
-          { label: 'Revenue', data: daily.map(d => d.sales), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.4, borderWidth: 2 },
-          { label: 'Profit', data: daily.map(d => d.profit), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+          {
+            label: 'Revenue',
+            data: daily.map(function(d) { return d.sales; }),
+            borderColor: '#10b981',
+            borderWidth: 2.5,
+            backgroundColor: revGrad,
+            fill: true,
+            tension: 0.38,
+            pointRadius: daily.length > 30 ? 0 : 2,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#10b981',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
+          },
+          {
+            label: 'Gross Profit',
+            data: daily.map(function(d) { return d.profit; }),
+            borderColor: '#06b6d4',
+            borderWidth: 2.5,
+            backgroundColor: profitGrad,
+            fill: true,
+            tension: 0.38,
+            pointRadius: daily.length > 30 ? 0 : 2,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#06b6d4',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
+          },
         ],
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
-        scales: { y: { ticks: { callback: v => symbol + v } } },
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            titleColor: isDark ? '#f9fafb' : '#111827',
+            bodyColor: isDark ? '#d1d5db' : '#374151',
+            borderColor: isDark ? '#374151' : '#e5e7eb',
+            borderWidth: 1,
+            padding: 10,
+            usePointStyle: true,
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.dataset.label + ': ' + symbol + parseFloat(context.parsed.y || 0).toFixed(2);
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
+              callback: function(v) { return symbol + v; }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
+              maxTicksLimit: 14
+            }
+          }
+        },
       },
     });
   }
 
-  // Orders line
+  // 2. Daily Orders Bar Chart
   var ordCtx = document.getElementById('ordersChart');
   if (ordCtx) {
     new Chart(ordCtx, {
-      type: 'line',
-      data: { labels: daily.map(d => d.label), datasets: [{ label: 'Orders', data: daily.map(d => d.orders), borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.4, borderWidth: 2, pointRadius: 3 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+      type: 'bar',
+      data: {
+        labels: daily.map(function(d) { return d.label; }),
+        datasets: [{
+          label: 'Orders',
+          data: daily.map(function(d) { return d.orders; }),
+          backgroundColor: '#10b981',
+          hoverBackgroundColor: '#059669',
+          borderRadius: 6,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            titleColor: isDark ? '#f9fafb' : '#111827',
+            bodyColor: isDark ? '#d1d5db' : '#374151',
+            borderColor: isDark ? '#374151' : '#e5e7eb',
+            borderWidth: 1,
+            padding: 8,
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.parsed.y + ' orders';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
+              precision: 0
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 9 },
+              maxTicksLimit: 8
+            }
+          }
+        }
+      },
     });
   }
 
-  // Category pie
-  var catCtx = document.getElementById('catChart');
-  if (catCtx) {
-    new Chart(catCtx, {
-      type: 'doughnut',
-      data: { labels: cats.map(c => c.name), datasets: [{ data: cats.map(c => c.revenue), backgroundColor: cats.map(c => c.color) }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } },
-    });
-  }
-
-  // Category bar
+  // 3. Category Comparison Bar Chart
   var barCtx = document.getElementById('catBarChart');
   if (barCtx) {
     new Chart(barCtx, {
       type: 'bar',
       data: {
-        labels: cats.map(c => c.name),
+        labels: cats.map(function(c) { return c.name; }),
         datasets: [
-          { label: 'Revenue', data: cats.map(c => c.revenue), backgroundColor: '#10b981', borderRadius: 4 },
-          { label: 'Profit', data: cats.map(c => c.profit), backgroundColor: '#059669', borderRadius: 4 },
+          {
+            label: 'Revenue',
+            data: cats.map(function(c) { return c.revenue; }),
+            backgroundColor: '#10b981',
+            hoverBackgroundColor: '#059669',
+            borderRadius: 6,
+            borderSkipped: false,
+          },
+          {
+            label: 'Gross Profit',
+            data: cats.map(function(c) { return c.profit; }),
+            backgroundColor: '#06b6d4',
+            hoverBackgroundColor: '#0891b2',
+            borderRadius: 6,
+            borderSkipped: false,
+          },
         ],
       },
-      options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => symbol + v } } } },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'end',
+            labels: {
+              boxWidth: 12,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: 600 },
+              color: isDark ? '#d1d5db' : '#374151'
+            }
+          },
+          tooltip: {
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            titleColor: isDark ? '#f9fafb' : '#111827',
+            bodyColor: isDark ? '#d1d5db' : '#374151',
+            borderColor: isDark ? '#374151' : '#e5e7eb',
+            borderWidth: 1,
+            padding: 8,
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.dataset.label + ': ' + symbol + parseFloat(context.parsed.y || 0).toFixed(2);
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: gridColor },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
+              callback: function(v) { return symbol + v; }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: textColor,
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
+            }
+          }
+        }
+      },
     });
   }
+
+  // Date Preset Quick Filter
+  window.setPreset = function(from, to) {
+    var fInput = document.getElementById('filterDateFrom');
+    var tInput = document.getElementById('filterDateTo');
+    if (fInput && tInput) {
+      fInput.value = from;
+      tInput.value = to;
+      document.getElementById('reportFilterForm').submit();
+    }
+  };
+
+  if (window.lucide) lucide.createIcons();
 })();
 </script>
 {% endblock %}

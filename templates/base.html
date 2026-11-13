@@ -113,9 +113,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Dashboard</span>
               <span class="nav-desc text-[10px] truncate">Store metrics & sales</span>
             </div>
-            {% if active_view == 'dashboard' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
 
           <a href="/reports" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'reports' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
@@ -126,9 +123,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Reports & Analytics</span>
               <span class="nav-desc text-[10px] truncate">Revenue & hourly stats</span>
             </div>
-            {% if active_view == 'reports' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
         </div>
 
@@ -146,9 +140,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Products Catalog</span>
               <span class="nav-desc text-[10px] truncate">SKUs, pricing & tags</span>
             </div>
-            {% if active_view == 'products' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
 
           <a href="/inventory" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'inventory' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
@@ -159,9 +150,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Inventory Stock</span>
               <span class="nav-desc text-[10px] truncate">Stock adjustments</span>
             </div>
-            {% if active_view == 'inventory' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
 
           <a href="/orders" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'orders' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
@@ -172,9 +160,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Orders & Sales</span>
               <span class="nav-desc text-[10px] truncate">Transactions history</span>
             </div>
-            {% if active_view == 'orders' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
 
           <a href="/invoices" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'invoices' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
@@ -185,9 +170,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Invoices & Receipts</span>
               <span class="nav-desc text-[10px] truncate">Thermal print & PDF</span>
             </div>
-            {% if active_view == 'invoices' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
 
           <a href="/customers" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'customers' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
@@ -198,9 +180,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Customers CRM</span>
               <span class="nav-desc text-[10px] truncate">Loyalty points & tiers</span>
             </div>
-            {% if active_view == 'customers' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
         </div>
 
@@ -219,22 +198,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Staff Accounts</span>
               <span class="nav-desc text-[10px] truncate">Roles & permissions</span>
             </div>
-            {% if active_view == 'users' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
-          </a>
-
-          <a href="/backup" class="sidebar-nav-link group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium {% if active_view == 'backup' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-            <div class="nav-icon-box w-7 h-7 rounded-lg grid place-items-center shrink-0">
-              <i data-lucide="hard-drive" class="w-4 h-4"></i>
-            </div>
-            <div class="flex flex-col items-start leading-tight overflow-hidden flex-1">
-              <span class="nav-title font-semibold text-[12.5px] truncate">Database Backup</span>
-              <span class="nav-desc text-[10px] truncate">Snapshots & Local Backup</span>
-            </div>
-            {% if active_view == 'backup' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
           {% endif %}
 
@@ -246,9 +209,6 @@
               <span class="nav-title font-semibold text-[12.5px] truncate">Store Settings</span>
               <span class="nav-desc text-[10px] truncate">Tax, receipt & currency</span>
             </div>
-            {% if active_view == 'settings' %}
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-            {% endif %}
           </a>
         </div>
 
@@ -313,10 +273,22 @@
           <i data-lucide="sun" class="w-[18px] h-[18px] hidden dark:block"></i>
         </button>
         <button id="fullscreenToggleBtn" type="button" onclick="toggleFullscreen()"
-          class="grid place-items-center w-9 h-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
-          title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
-          <i id="fullscreenMaximizeIcon" data-lucide="maximize-2" class="w-[18px] h-[18px]"></i>
-          <i id="fullscreenMinimizeIcon" data-lucide="minimize-2" class="w-[18px] h-[18px] hidden"></i>
+          class="group relative grid place-items-center w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 shrink-0 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer active:scale-95 focus:outline-none"
+          title="Enter Fullscreen (F11 or click)" aria-label="Enter Fullscreen">
+          <!-- Maximize Icon (Outward diagonal arrows: matches user spec) -->
+          <svg id="fullscreenMaximizeIcon" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          <!-- Minimize / Restore Icon (Inward diagonal arrows: short screen) -->
+          <svg id="fullscreenMinimizeIcon" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] hidden transition-transform duration-200 group-hover:scale-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 14 10 14 10 20"></polyline>
+            <polyline points="20 10 14 10 14 4"></polyline>
+            <line x1="14" y1="10" x2="21" y2="3"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
         </button>
       </header>
 
@@ -379,8 +351,12 @@
       return !!(
         document.fullscreenElement ||
         document.webkitFullscreenElement ||
+        document.webkitCurrentFullScreenElement ||
         document.mozFullScreenElement ||
-        document.msFullscreenElement
+        document.msFullscreenElement ||
+        document.webkitIsFullScreen ||
+        document.mozFullScreen ||
+        document.documentElement.classList.contains('app-kiosk-fullscreen')
       );
     }
 
@@ -401,53 +377,116 @@
       }
 
       if (btn) {
-        btn.title = isFull ? 'Exit Fullscreen (Esc)' : 'Enter Fullscreen (F11)';
+        btn.title = isFull ? 'Exit Fullscreen (Esc or click)' : 'Enter Fullscreen (F11 or click)';
         btn.setAttribute('aria-label', isFull ? 'Exit Fullscreen' : 'Enter Fullscreen');
         if (isFull) {
-          btn.classList.add('text-primary-600', 'dark:text-primary-400');
+          btn.classList.add('text-emerald-600', 'dark:text-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/60', 'ring-1', 'ring-emerald-500/30');
+          btn.classList.remove('text-gray-600', 'dark:text-gray-300');
         } else {
-          btn.classList.remove('text-primary-600', 'dark:text-primary-400');
+          btn.classList.remove('text-emerald-600', 'dark:text-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/60', 'ring-1', 'ring-emerald-500/30');
+          btn.classList.add('text-gray-600', 'dark:text-gray-300');
         }
       }
-
-      if (window.lucide) lucide.createIcons();
     }
 
-    function toggleFullscreen() {
+    async function toggleFullscreen() {
       try {
-        if (!isFullscreenActive()) {
-          const docEl = document.documentElement;
+        const isFull = isFullscreenActive();
+        const docEl = document.documentElement;
+
+        if (!isFull) {
+          // ENTER FULLSCREEN
+          docEl.classList.add('app-kiosk-fullscreen');
           if (docEl.requestFullscreen) {
-            docEl.requestFullscreen().catch(function (err) { console.warn('[Fullscreen Request]', err); });
+            try {
+              await docEl.requestFullscreen();
+            } catch (err) {
+              console.warn('[Fullscreen Native Request blocked or failed, keeping simulated kiosk mode]', err);
+            }
           } else if (docEl.webkitRequestFullscreen) {
-            docEl.webkitRequestFullscreen();
+            try { docEl.webkitRequestFullscreen(); } catch (err) {}
           } else if (docEl.mozRequestFullScreen) {
-            docEl.mozRequestFullScreen();
+            try { docEl.mozRequestFullScreen(); } catch (err) {}
           } else if (docEl.msRequestFullscreen) {
-            docEl.msRequestFullscreen();
+            try { docEl.msRequestFullscreen(); } catch (err) {}
           }
         } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen().catch(function (err) { console.warn('[Fullscreen Exit]', err); });
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+          // EXIT FULLSCREEN (short screen as it was earlier)
+          docEl.classList.remove('app-kiosk-fullscreen');
+
+          const hasNativeFull = !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.webkitCurrentFullScreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement ||
+            document.webkitIsFullScreen ||
+            document.mozFullScreen
+          );
+
+          if (hasNativeFull) {
+            if (document.exitFullscreen) {
+              try {
+                await document.exitFullscreen();
+              } catch (err) {
+                console.warn('[Fullscreen Native Exit]', err);
+              }
+            } else if (document.webkitExitFullscreen) {
+              try { document.webkitExitFullscreen(); } catch (err) {}
+            } else if (document.mozCancelFullScreen) {
+              try { document.mozCancelFullScreen(); } catch (err) {}
+            } else if (document.msExitFullscreen) {
+              try { document.msExitFullscreen(); } catch (err) {}
+            }
           }
         }
       } catch (err) {
         console.warn('[Fullscreen Toggle Error]', err);
+      } finally {
+        updateFullscreenUI();
       }
     }
 
     window.toggleFullscreen = toggleFullscreen;
     window.updateFullscreenUI = updateFullscreenUI;
 
+    // Listen to native browser fullscreen change events
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(function (evt) {
-      document.addEventListener(evt, updateFullscreenUI);
+      document.addEventListener(evt, function () {
+        const nativeActive = !!(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.webkitCurrentFullScreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement ||
+          document.webkitIsFullScreen ||
+          document.mozFullScreen
+        );
+        if (!nativeActive) {
+          document.documentElement.classList.remove('app-kiosk-fullscreen');
+        }
+        updateFullscreenUI();
+      });
     });
+
+    // Keyboard shortcuts: F11 toggle and Escape exit
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'F11') {
+        setTimeout(updateFullscreenUI, 150);
+      } else if (e.key === 'Escape') {
+        if (document.documentElement.classList.contains('app-kiosk-fullscreen')) {
+          document.documentElement.classList.remove('app-kiosk-fullscreen');
+          updateFullscreenUI();
+        }
+      }
+    });
+
+    // Run on initial render
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateFullscreenUI);
+    } else {
+      updateFullscreenUI();
+    }
 
     // Live clock
     function updateClock() {
